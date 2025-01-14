@@ -1,14 +1,14 @@
 <script lang="ts">
   import { Themes } from '@/types/Themes'
   import { Colors } from '@/data/Colors'
-  import SearchQueriesTab from '@/components/tabs/SearchQueriesTab.vue'
-  import RecipeTab from '@/components/tabs/SearchQueriesTab.vue'
+  import SearchTab from '@/components/tabs/SearchTab.vue'
+  import RecipeTab from '@/components/tabs/RecipeTab.vue'
   import SettingsTab from '@/components/tabs/SettingsTab.vue'
   import AboutTab from '@/components/tabs/AboutTab.vue'
 
   const tabOptions = {
-    searchQueries: {
-      component: SearchQueriesTab,
+    search: {
+      component: SearchTab,
       title: 'Поиск',
     },
     recipe: {
@@ -26,7 +26,7 @@
   }
 </script>
 <script setup lang="ts">
-  const currentTabName = ref('searchQueries')
+  const currentTabName = ref('search')
   const activeColor = ref(Colors.primary)
 
   const currentTab = computed(
@@ -48,7 +48,7 @@
 <template>
   <van-config-provider class="h-screen" :theme="theme">
     <van-tabbar v-model="currentTabName" :fixed="false" class="mb-0" :active-color="activeColor">
-      <van-tabbar-item name="searchQueries">
+      <van-tabbar-item name="search">
         <strong>Поиск</strong>
         <template #icon>
           <Icon name="search-queries" class="text-22" />

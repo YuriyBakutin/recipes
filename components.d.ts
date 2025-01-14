@@ -10,7 +10,7 @@ declare module 'vue' {
     AboutTab: typeof import('./src/components/tabs/AboutTab.vue')['default']
     Icon: typeof import('./src/components/common/Icon.vue')['default']
     RecipeTab: typeof import('./src/components/tabs/RecipeTab.vue')['default']
-    SearchQueriesTab: typeof import('./src/components/tabs/SearchQueriesTab.vue')['default']
+    SearchTab: typeof import('./src/components/tabs/SearchTab.vue')['default']
     SettingsTab: typeof import('./src/components/tabs/SettingsTab.vue')['default']
   }
 }
