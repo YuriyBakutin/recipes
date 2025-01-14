@@ -19,6 +19,7 @@
     "dexie": "^4.0.10",
     "dexie-export-import": "^4.1.4",
     "rxjs": "^7.8.1",
+    "vant": "^4.9.15",
     "vue": "^3.5.13"
   },
   "devDependencies": {

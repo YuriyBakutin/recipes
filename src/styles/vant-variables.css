@@ -1,0 +1,10 @@
+:root:root {
+  --van-tabbar-height: 80px;
+  --van-field-label-color: var(--van-text-color-2);
+  --van-field-disabled-text-color: var(--van-text-color-2);
+  --van-field-label-width: 238px;
+  --van-toast-default-width: 250px;
+  --van-field-input-disabled-text-color: var(--van-field-input-text-color);
+  --van-field-placeholder-text-color: var(--van-gray-6);
+  /* --van-toast-background: fade(var(--van-black), 70%) */
+}
