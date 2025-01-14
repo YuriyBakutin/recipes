@@ -19,10 +19,8 @@
     await db.settings.put({ id: 1, theme: theme.value })
   }
 
-  onBeforeMount(
-    async () => {
-      theme.value = prop.theme
-    }
+  onMounted(
+    async () => theme.value = props.theme
   )
 </script>
 <template>

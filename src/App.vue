@@ -46,7 +46,7 @@
     }
   }
 
-  onMounted(
+  onBeforeMount(
     async () => {
       theme.value = (await db.settings.get({ id: 1 }))?.theme ?? Themes.light
     }
