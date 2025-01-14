@@ -1,13 +1,29 @@
 <script lang="ts">
   import { Themes } from '@/types/Themes'
+  import { db } from '@/db'
 </script>
 <script lang="ts" setup>
   const emit = defineEmits(['changeTheme'])
+
+  const props = withDefaults(defineProps<{
+    theme: Themes,
+  }>(), {
+    theme: Themes.light,
+  })
+
   const theme = ref(Themes.light)
 
   const changeTheme = async (value) => {
     emit('changeTheme', theme.value)
+
+    await db.settings.put({ id: 1, theme: theme.value })
   }
+
+  onBeforeMount(
+    async () => {
+      theme.value = prop.theme
+    }
+  )
 </script>
 <template>
   <div class="van-hairline--bottom pt-10 pb-20">

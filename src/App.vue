@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { db } from '@/db'
   import { Themes } from '@/types/Themes'
   import { Colors } from '@/data/Colors'
   import SearchTab from '@/components/tabs/SearchTab.vue'
@@ -44,6 +45,12 @@
       theme.value = newTheme
     }
   }
+
+  onMounted(
+    async () => {
+      theme.value = (await db.settings.get({ id: 1 }))?.theme ?? Themes.light
+    }
+  )
 </script>
 <template>
   <van-config-provider class="h-screen" :theme="theme">
@@ -80,6 +87,7 @@
           </h1>
           <component
             :is="currentTab"
+            :theme="theme"
             @changeTheme="changeTheme"
           />
       </div>
