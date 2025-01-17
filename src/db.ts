@@ -14,7 +14,7 @@ export interface IHashtag {
 }
 
 export interface IHashtag_Recipe {
-  hashtagId: number,
+  hashtagName: string,
   recipeId: number,
 }
 
@@ -41,7 +41,7 @@ export class RecipesDatabase extends Dexie {
     this.version(1).stores({
       recipes: '++id, name, content, deletionDate',
       hashtags: '&name',
-      hashtag_recipe: '&[hashtagId+recipeId], hashtagId, recipeId',
+      hashtag_recipe: '&[hashtagName+recipeId], hashtagName, recipeId',
       hashtagExps: '++id, name, hashtagExp',
       settings: '++id, theme',
     })

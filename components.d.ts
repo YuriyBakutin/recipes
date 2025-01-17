@@ -8,7 +8,10 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AboutTab: typeof import('./src/components/tabs/AboutTab.vue')['default']
+    HashtagList_: typeof import('./src/components/hashTags/HashtagList_.vue')['default']
+    HashtagListEditor: typeof import('./src/components/hashTags/HashtagListEditor.vue')['default']
     Icon: typeof import('./src/components/common/Icon.vue')['default']
+    Recipe: typeof import('./src/components/Recipe.vue')['default']
     RecipeTab: typeof import('./src/components/tabs/RecipeTab.vue')['default']
     SearchTab: typeof import('./src/components/tabs/SearchTab.vue')['default']
     SettingsTab: typeof import('./src/components/tabs/SettingsTab.vue')['default']

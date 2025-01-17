@@ -13,18 +13,16 @@ export default defineConfig({
     vue(),
     svgLoader(),
     AutoImport({
-      dts: true, // generate TypeScript declaration
-      // eslintrc: {
-      //   enabled: true, // generate ESLint configuration
-      // },
       imports: ['vue'],
       resolvers: [VantResolver()],
+      dts: true,
     }),
     Components({
       dirs: [
         'src/components',
         'src/components/tabs',
         'src/components/common',
+        'src/components/hashTags',
       ],
       dts: true,
     }),
