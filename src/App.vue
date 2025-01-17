@@ -89,7 +89,6 @@
           </h1>
           <component
             :is="currentTab"
-            :theme="theme"
             @changeTheme="changeTheme"
           />
       </div>

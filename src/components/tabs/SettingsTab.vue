@@ -1,23 +1,15 @@
 <script lang="ts">
+  import { db, observableQuery } from '@/db'
   import { Themes } from '@/types/Themes'
-  import { db } from '@/db'
 </script>
 <script lang="ts" setup>
-  const props = withDefaults(defineProps<{
-    theme: Themes,
-  }>(), {
-    theme: Themes.light,
+  const theme = observableQuery(async () => {
+    return (await db.settings.get({ id: 1 }))?.theme ?? Themes.light
   })
-
-  const theme = ref(Themes.light)
 
   const changeTheme = async (value) => {
     await db.settings.put({ id: 1, theme: theme.value })
   }
-
-  onMounted(
-    async () => theme.value = props.theme
-  )
 </script>
 <template>
   <div class="van-hairline--bottom pt-10 pb-20">
