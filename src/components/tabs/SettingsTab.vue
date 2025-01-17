@@ -3,8 +3,6 @@
   import { db } from '@/db'
 </script>
 <script lang="ts" setup>
-  const emit = defineEmits(['changeTheme'])
-
   const props = withDefaults(defineProps<{
     theme: Themes,
   }>(), {
@@ -14,8 +12,6 @@
   const theme = ref(Themes.light)
 
   const changeTheme = async (value) => {
-    emit('changeTheme', theme.value)
-
     await db.settings.put({ id: 1, theme: theme.value })
   }
 

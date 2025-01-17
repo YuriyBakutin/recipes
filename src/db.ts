@@ -1,6 +1,8 @@
-import Dexie from 'dexie';
-import type { Table } from 'dexie';
+import Dexie, { liveQuery } from 'dexie';
+import type { Table, Observable } from 'dexie';
+import type { Ref } from 'vue'
 import { Themes } from '@/types/Themes'
+import { useObservable } from '@vueuse/rxjs'
 
 export interface IRecipe {
   id?: number,
@@ -49,3 +51,7 @@ export class RecipesDatabase extends Dexie {
 }
 
 export const db = new RecipesDatabase()
+
+export const observableQuery = <T>(query: () => Promise<T>): Ref<T> => {
+  return (useObservable(liveQuery(query) as any) as T) as Ref<T>
+}

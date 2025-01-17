@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { db } from '@/db'
+  import { db, observableQuery } from '@/db'
   import { Themes } from '@/types/Themes'
   import { Colors, colorsInit } from '@/data/Colors'
   import SearchTab from '@/components/tabs/SearchTab.vue'
@@ -38,19 +38,15 @@
     () => tabOptions[currentTabName.value].title
   )
 
-  const theme = ref(Themes.light)
+  const theme = observableQuery(async () => {
+    return (await db.settings.get({ id: 1 }))?.theme ?? Themes.light
+  })
 
   const changeTheme = (newTheme?: Themes) => {
     if (newTheme) {
       theme.value = newTheme
     }
   }
-
-  onBeforeMount(
-    async () => {
-      theme.value = (await db.settings.get({ id: 1 }))?.theme ?? Themes.light
-    }
-  )
 
   onMounted(
     () => {
