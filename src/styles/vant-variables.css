@@ -6,5 +6,7 @@
   --van-toast-default-width: 250px;
   --van-field-input-disabled-text-color: var(--van-field-input-text-color);
   --van-field-placeholder-text-color: var(--van-gray-6);
+  --van-button-small-font-size: 14px;
+  --van-background-2: var(--van-orange-1);
   /* --van-toast-background: fade(var(--van-black), 70%) */
 }

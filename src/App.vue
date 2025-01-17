@@ -1,7 +1,7 @@
 <script lang="ts">
   import { db } from '@/db'
   import { Themes } from '@/types/Themes'
-  import { Colors } from '@/data/Colors'
+  import { Colors, colorsInit } from '@/data/Colors'
   import SearchTab from '@/components/tabs/SearchTab.vue'
   import RecipeTab from '@/components/tabs/RecipeTab.vue'
   import SettingsTab from '@/components/tabs/SettingsTab.vue'
@@ -51,6 +51,12 @@
       theme.value = (await db.settings.get({ id: 1 }))?.theme ?? Themes.light
     }
   )
+
+  onMounted(
+    () => {
+      colorsInit()
+    }
+  )
 </script>
 <template>
   <van-config-provider class="h-screen" :theme="theme">
@@ -58,31 +64,31 @@
       <van-tabbar-item name="search">
         <strong>Поиск</strong>
         <template #icon>
-          <Icon name="search-queries" class="text-22" />
+          <Icon name="search_m" class="text-24" />
         </template>
       </van-tabbar-item>
       <van-tabbar-item name="recipe">
         <strong>Рецепт</strong>
         <template #icon>
-          <Icon name="pot" />
+          <Icon name="pot" class="text-24" />
         </template>
       </van-tabbar-item>
       <van-tabbar-item name="settings">
         <strong>Настройки</strong>
         <template #icon>
-          <Icon name="settings" class="text-22" />
+          <Icon name="options" class="text-24" />
         </template>
       </van-tabbar-item>
       <van-tabbar-item name="about">
         <strong>О программе</strong>
         <template #icon>
-          <Icon name="about" />
+          <Icon name="about" class="text-24" />
         </template>
       </van-tabbar-item>
     </van-tabbar>
     <KeepAlive>
       <div class="main-block overflow-y-auto">
-          <h1 class="w-full text-center font-bold text-18 text-primary my-10">
+          <h1 class="w-full text-center font-bold text-18 text-primary mt-10 mb-14">
             {{ currentTitle }}
           </h1>
           <component

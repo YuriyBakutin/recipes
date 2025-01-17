@@ -1,4 +1,16 @@
+body {
+  @apply h-screen m-0 p-0 text-14 bg-orange-1;
+  font-family: "Inter";
+}
+
 .van-theme-dark body {
-  color: #f5f5f5;
-  background-color: #1C1C1C;
+  @apply bg-gray-9 text-gray-5;
+}
+
+.van-padding {
+  padding: var(--van-cell-vertical-padding) var(--van-cell-horizontal-padding);
+}
+
+.van-padding-left {
+  padding-left: var(--van-cell-horizontal-padding)
 }

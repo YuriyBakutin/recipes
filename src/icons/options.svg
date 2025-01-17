@@ -1,0 +1,7 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+   stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2">
+   <ellipse cx="15" cy="16" rx="3" ry="3" />
+   <path d="M11.565 16H3M21 15.985h-3" />
+   <ellipse cx="9" cy="8" rx="3" ry="3" />
+   <path d="M12.435 8.015H21M3 8h3" />
+</svg>

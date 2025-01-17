@@ -1,12 +1,12 @@
 .van-field__control {
-  /* background-color: var(--van-gray-1); */
+  background-color: var(--van-white);
   padding-left: 6px;
-  border: 1px solid var(--van-gray-4);
+  border: 1px solid var(--van-gray-6);
   border-radius: 4px;
 }
 
 .van-theme-dark .van-field__control {
-  /* background-color: var(--van-gray-7); */
+  background-color: var(--van-gray-8);
   border-color: var(--van-gray-7);
 }
 
@@ -40,7 +40,67 @@
   overflow: unset;
 }
 
+.van-cell {
+  @applay bg-orange-1;
+}
+
+.van-theme-dark .van-cell {
+  background-color: var(--van-gray-9);
+  /* @applay bg-gray-8; */
+}
+
+
+
 .van-field__body .disabled,
 .van-field__body [disabled]:not([disabled=false]) {
   opacity: 1 !important;
+}
+
+.van-button {
+  margin: var(--van-cell-vertical-padding) var(--van-cell-horizontal-padding);
+}
+
+.van-field__button {
+  padding-left: var(--van-cell-horizontal-padding);
+}
+
+.van-theme-dark .van-tabbar {
+  background-color: var(--van-gray-9);
+}
+
+.van-theme-dark .van-tabbar-item--active {
+  background-color: var(--van-gray-9);
+  color: var(--van-orange-3)!important;
+}
+
+.van-theme-dark .van-tabbar-item {
+  color: var(--van-gray-5)
+}
+
+.van-theme-dark .van-button--plain.van-button--primary {
+  color: var(--van-orange-3);
+}
+
+.van-theme-dark .van-button--primary {
+  border-color: var(--van-orange-3);
+}
+
+.van-theme-dark .van-radio__icon--checked.van-radio__icon--dot {
+  border-color: var(--van-orange-3);
+}
+
+.van-theme-dark .van-radio__icon--checked.van-radio__icon--dot .van-radio__icon--dot__icon {
+  background-color: var(--van-orange-3);
+}
+
+.van-button--plain {
+  background-color: var(--van-orange-4);
+}
+
+.van-theme-dark .van-button--plain {
+  background-color: var(--van-gray-8);
+}
+
+.van-cell:after {
+  border-bottom: unset;
 }

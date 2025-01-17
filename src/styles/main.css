@@ -37,3 +37,6 @@ body,
   @apply text-12 text-attention;
 }
 
+.van-theme-dark .text-primary {
+  color: var(--van-orange-3)
+}

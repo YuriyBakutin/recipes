@@ -35,13 +35,13 @@
     >
       <van-radio name="light">
         <div class="w-full flex gap-4 items-center pl-10">
-          <Icon name="light" class="text-22"/>
+          <Icon name="light_m" class="text-22"/>
           <span>Светлая</span>
         </div>
       </van-radio>
       <van-radio name="dark">
         <div class="w-full flex gap-4 items-center pl-10">
-          <Icon name="dark" class="text-22"/>
+          <Icon name="dark_m" class="text-22"/>
           <span>Тёмная</span>
         </div>
       </van-radio>
