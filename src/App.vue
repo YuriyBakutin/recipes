@@ -18,7 +18,7 @@
     },
     settings: {
       component: SettingsTab,
-      title: 'Настройки'
+      title: 'Настройки',
     },
     about: {
       component: AboutTab,
@@ -27,16 +27,14 @@
   }
 </script>
 <script setup lang="ts">
-  const currentTabName = ref('search')
+  const currentTabName = ref('search' as keyof typeof tabOptions)
   const activeColor = ref(Colors.primary)
 
-  const currentTab = computed(
-    () => tabOptions[currentTabName.value].component
+  const currentTabComponent = computed(
+    () => tabOptions[currentTabName.value].component,
   )
 
-  const currentTitle = computed(
-    () => tabOptions[currentTabName.value].title
-  )
+  const currentTitle = computed(() => tabOptions[currentTabName.value].title)
 
   const theme = observableQuery(async () => {
     return (await db.settings.get({ id: 1 }))?.theme ?? Themes.light
@@ -48,15 +46,18 @@
     }
   }
 
-  onMounted(
-    () => {
-      colorsInit()
-    }
-  )
+  onMounted(() => {
+    colorsInit()
+  })
 </script>
 <template>
   <van-config-provider class="h-screen" :theme="theme">
-    <van-tabbar v-model="currentTabName" :fixed="false" class="mb-0" :active-color="activeColor">
+    <van-tabbar
+      v-model="currentTabName"
+      :fixed="false"
+      class="mb-0"
+      :active-color="activeColor"
+    >
       <van-tabbar-item name="search">
         <strong>Поиск</strong>
         <template #icon>
@@ -84,19 +85,18 @@
     </van-tabbar>
     <KeepAlive>
       <div class="main-block overflow-y-auto">
-          <h1 class="w-full text-center font-bold text-18 text-primary mt-10 mb-14">
-            {{ currentTitle }}
-          </h1>
-          <component
-            :is="currentTab"
-            @changeTheme="changeTheme"
-          />
+        <h1
+          class="w-full text-center font-bold text-18 text-primary mt-10 mb-14"
+        >
+          {{ currentTitle }}
+        </h1>
+        <component :is="currentTabComponent" @changeTheme="changeTheme" />
       </div>
     </KeepAlive>
   </van-config-provider>
 </template>
 <style>
-.main-block {
-  height: calc(100% - var(--van-tabbar-height));
-}
+  .main-block {
+    height: calc(100% - var(--van-tabbar-height));
+  }
 </style>

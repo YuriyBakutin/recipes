@@ -1,7 +1,7 @@
 <script lang="ts">
   const hashtagInvalidRegExpString = '^_+|_(_)+|[^а-яёА-ЯЁ\\w_]'
 
-  // Здесь важна последовательность замен. Поэтому массив.
+  // NOTE: Здесь важна последовательность замен. Поэтому массив.
   const replacement = [
     [' ', '_'],
     ['_(_)+', '_'],
@@ -15,8 +15,8 @@
   const emit = defineEmits(['update:modelValue'])
 
   const props = defineProps<{
-    modelValue?: string[],
-    error?: boolean,
+    modelValue?: string[]
+    error?: boolean
   }>()
 
   const newHashtag = ref('')
@@ -73,7 +73,7 @@
       await nextTick()
 
       watchEvent = false
-    }
+    },
   )
 
   const insertCharToStringWithHashtag = (char: string) => {
@@ -104,9 +104,11 @@
     }
 
     const newHashtag = insertCharToStringWithHashtag(char)
-    const isValid = !(new RegExp(hashtagInvalidRegExpString, 'g')).test(newHashtag)
+    const isValid = !new RegExp(hashtagInvalidRegExpString, 'g').test(
+      newHashtag,
+    )
 
-    if(isValid) {
+    if (isValid) {
       await acceptChar(char)
     }
   }
@@ -116,45 +118,46 @@
     const textBefore = newHashtag.value.substring(0, cursorPosition)
     const textAfter = newHashtag.value.substring(cursorPosition)
     newHashtag.value = textBefore + char + textAfter
-
     await nextTick()
-
     setCursorPosition(++cursorPosition)
   }
 
-  const editHashtag = (index) => {
-    newHashtag.value = props.modelValue[index]
+  const editHashtag = (index: number) => {
+    const hashtagList = props.modelValue as string[]
 
-    emit(
-      'update:modelValue',
-      [...props.modelValue.slice(0,index), ...props.modelValue.slice(index + 1)],
-    )
+    newHashtag.value = hashtagList[index]
+
+    emit('update:modelValue', [
+      ...hashtagList.slice(0, index),
+      ...hashtagList.slice(index + 1),
+    ])
   }
 
   const addHashtag = () => {
+    if (!newHashtag.value) {
+      return
+    }
     const clearableNewHashtag = newHashtag.value.replaceAll(/_$/g, '')
 
     const newHashtags = [
-      ...new Set(props.modelValue).add(clearableNewHashtag)
+      ...new Set(props.modelValue).add(clearableNewHashtag),
     ].sort()
 
     emit('update:modelValue', newHashtags)
     newHashtag.value = ''
   }
 
-  onMounted(
-    () => {
-      inputElem.value = fieldElem.value.$el.querySelector('input')
-    }
-  )
+  onMounted(() => {
+    inputElem.value = fieldElem.value.$el.querySelector('input')
+  })
 </script>
 <template>
-  <div class="w-full flex flex-col">
+  <div class="w-full flex flex-col mt-12">
     <div class="w-full min-h-20 flex flex-wrap van-padding-left">
-      Хештеги:&nbsp;
-      <template v-if="props.modelValue.length">
+      <span class="font-bold text-primary">Хештеги:&nbsp;</span>
+      <template v-if="props.modelValue?.length">
         <div
-          v-for="hashtag, index in props.modelValue"
+          v-for="(hashtag, index) in props.modelValue"
           :key="hashtag"
           class="italic cursor-pointer"
           @click.stop.prevent="editHashtag(index)"
@@ -165,30 +168,39 @@
       <span v-else-if="props.error" class="text-error">
         — добавьте хештеги.
       </span>
-      <span v-else class="text-inactive">— добавьте хештеги, чтобы этот рецепт было легче искать.</span>
+      <span v-else class="text-inactive"
+        >— добавьте хештеги, чтобы этот рецепт потом было легче найти.</span
+      >
     </div>
-    <div
-      class="w-full flex items-center van-padding-left"
-    >
+    <div class="w-full flex items-center van-padding-left">
       <Icon
-        name="add-button"
-        class="text-24 text-primary"
-        :class="!newHashtag ? 'opacity-[0.5]' : 'cursor-pointer'"
+        name="save-up"
+        class="text-24"
+        :class="
+          !newHashtag ?
+            'opacity-[0.5] text-inactive'
+          : 'cursor-pointer text-primary'
+        "
         @click="addHashtag"
       />
-      <van-field v-model="newHashtag" placeholder="#Добавить хештег"
-        ref="fieldElem"
-        @keypress.prevent="onKeypress"
-      >
-        <template #button>
-          <Icon
-            name="close-button"
-            class="cursor-pointer text-24 text-primary"
-            :class="!newHashtag ? 'opacity-[0.5]' : 'cursor-pointer'"
-            @click="newHashtag = ''"
-          />
-        </template>
-      </van-field>
+      <div class="relative w-full">
+        <van-field
+          v-model="newHashtag"
+          placeholder="#Добавить хештег"
+          ref="fieldElem"
+          @keypress.prevent="onKeypress"
+        />
+        <Icon
+          name="close"
+          class="absolute right-0 top-0 bottom-0 text-24 align-middle van-padding-right"
+          :class="
+            !newHashtag ?
+              'opacity-[0.5] text-inactive'
+            : 'cursor-pointer text-primary'
+          "
+          @click="newHashtag = ''"
+        />
+      </div>
     </div>
   </div>
 </template>

@@ -1,28 +1,48 @@
 <script setup lang="ts">
   const props = defineProps<{
-    name: string,
+    name: string
   }>()
 
   const content = ref('' as any)
+  const iconEnvelope = ref(null)
+  const clickable = ref(false)
 
   const getContent = async () => {
-    content.value = (await import(`../../icons/${props.name}.svg?raw`))?.default ?? ''
+    content.value =
+      (await import(`../../icons/${props.name}.svg?raw`))?.default ?? ''
   }
 
-  watch(
-    () => props.name,
-    getContent,
-  )
+  watch(() => () => props.name, getContent)
 
-  onMounted(getContent)
+  onMounted(async () => {
+    await getContent()
+
+    const observer = new MutationObserver(() => {
+      clickable.value = iconEnvelope.value.classList.contains('cursor-pointer')
+    })
+
+    observer.observe(iconEnvelope.value, { attributes: true })
+    clickable.value = iconEnvelope.value.classList.contains('cursor-pointer')
+  })
 </script>
 <template>
-  <div class="inline" v-html="content" />
+  <button
+    :disabled="!clickable"
+    ref="iconEnvelope"
+    class="icon-button inline-flex justify-center items-center text-center"
+    :class="{ clickable }"
+    v-html="content"
+  />
 </template>
 
-<style>
-.size-full svg {
-  width: 100%;
-  height: 100%;
-}
+<style scoped>
+  .size-full svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .clickable.icon-button:focus,
+  .clickable.icon-button:hover {
+    @apply opacity-60;
+  }
 </style>

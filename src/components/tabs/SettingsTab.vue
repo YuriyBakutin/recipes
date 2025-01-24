@@ -7,8 +7,8 @@
     return (await db.settings.get({ id: 1 }))?.theme ?? Themes.light
   })
 
-  const changeTheme = async (value) => {
-    await db.settings.put({ id: 1, theme: theme.value })
+  const changeTheme = async () => {
+    await db.settings.update(1, { theme: theme.value })
   }
 </script>
 <template>
@@ -23,13 +23,13 @@
     >
       <van-radio name="light">
         <div class="w-full flex gap-4 items-center pl-10">
-          <Icon name="light_m" class="text-22"/>
+          <Icon name="light_m" class="text-22" />
           <span>Светлая</span>
         </div>
       </van-radio>
       <van-radio name="dark">
         <div class="w-full flex gap-4 items-center pl-10">
-          <Icon name="dark_m" class="text-22"/>
+          <Icon name="dark_m" class="text-22" />
           <span>Тёмная</span>
         </div>
       </van-radio>
