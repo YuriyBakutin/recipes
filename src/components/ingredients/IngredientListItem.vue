@@ -13,13 +13,13 @@
   const odd = computed(() => !(props.index % 2))
 </script>
 <template>
-  <div class="pr-5 py-5 van-padding-left" :class="{ 'bg-[#00000022]': odd }">
+  <div class="pr-5 py-5 van-padding-left" :class="{ 'odd-bg': odd }">
     {{ props.ingredient.ingredient.name }}
   </div>
-  <div class="p-5" :class="{ 'bg-[#00000022]': odd }">
+  <div class="p-5" :class="{ 'odd-bg': odd }">
     {{ props.ingredient.quantity }}
   </div>
-  <div class="p-5" :class="{ 'bg-[#00000022]': odd }">
+  <div class="p-5" :class="{ 'odd-bg': odd }">
     {{ props.ingredient.unit.name }}
   </div>
   <Icon
@@ -27,7 +27,7 @@
     name="edit"
     :clickable="true"
     class="text-16 text-primary cursor-pointer pl-5 van-padding-right"
-    :class="{ 'bg-[#00000022]': odd }"
+    :class="{ 'odd-bg': odd }"
     @click="emit('edit', props.index)"
   />
 </template>

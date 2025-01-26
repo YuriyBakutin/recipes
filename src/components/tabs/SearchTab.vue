@@ -28,15 +28,16 @@
   <h1 class="w-full text-center font-bold text-18 text-primary mt-10 mb-14">
     Поиск
   </h1>
-  <div>
+  <div class="van-padding">
     <van-checkbox v-model="inTrash" shape="square">
       Поиск в корзине
     </van-checkbox>
   </div>
   <RecipesSearchItem
-    v-for="recipesSearchItem in recipesSearchItems"
+    v-for="(recipesSearchItem, index) in recipesSearchItems"
     :key="recipesSearchItem.id"
     :recipesSearchItem="recipesSearchItem"
+    :index="index"
     @openRecipe="onOpenRecipe"
   />
 </template>
