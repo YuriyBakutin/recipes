@@ -25,8 +25,12 @@
       dbTableName: 'ingredients' | 'ingredientUnits'
       keyName?: string
       showPopupOnFocus?: boolean
-      accepted: boolean
+
+      // Массив уже введённых значений, которые не должны быть показаны
+      // в списке выбора
       hiddenItemList?: string[]
+
+      // При переходе в true переключает фокус страницы на поле ввода
       focusRequest?: boolean
     }>(),
     {
@@ -41,6 +45,7 @@
 
   const text = ref('')
   const fieldComponent = ref(null)
+  const inputElem = ref(null)
 
   watch(
     () => props.text,
@@ -90,7 +95,7 @@
     )
   })
 
-  const acceptItem = (item?: { id?: number; [key: string]: string }) => {
+  const acceptItem = async (item?: { id?: number; [key: string]: string }) => {
     if (props.hiddenItemList.includes(text.value)) {
       return
     }
@@ -98,7 +103,12 @@
     if (item) {
       emit('select', item)
 
-      // onFocus()
+      await nextTick()
+
+      const textLength = item[props.keyName].length
+      inputElem.value?.setSelectionRange(textLength, textLength)
+
+      onFocus()
       return
     }
 
@@ -179,6 +189,10 @@
       }
     },
   )
+
+  onMounted(() => {
+    inputElem.value = fieldComponent.value.$el.querySelector('input')
+  })
 </script>
 <template>
   <div class="relative">
