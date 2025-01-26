@@ -2,12 +2,14 @@ import Dexie from 'dexie'
 import { db } from '@/db'
 import type { IRecipe, IRecipe_Ingredient } from '@/db'
 import type { IIngredientInRecipeItem } from '@/types/IIngredientInRecipeItem'
+import differenceBetweenSets from '@/helpers/differenceBetweenSets'
 
 export default async (
   params: {
     recipeId?: number,
     recipeName: string,
     content: string,
+    note: string,
     hashtagNames: string[],
     oldHashtagNamesSet: Set<string>,
     oldIngredientIdSet: Set<number>,
@@ -18,6 +20,7 @@ export default async (
     recipeId,
     recipeName,
     content,
+    note,
     hashtagNames,
     oldHashtagNamesSet,
     oldIngredientIdSet,
@@ -26,11 +29,12 @@ export default async (
 
   const recipe = {
     name: recipeName,
-    content: content,
+    content,
+    note,
   } as IRecipe
 
   if (recipeId) {
-    recipe.id = recipeId // props.recipe.id
+    recipe.id = recipeId
   }
 
   const hashtagNamesSet = new Set(hashtagNames)
@@ -65,11 +69,12 @@ export default async (
 
       //  Удалить из таблицы связи все, которые исчезли из списка хештегов
       if (recipeId) {
-        const deletedHashtagNames = [...oldHashtagNamesSet].filter(
-          (name) => !hashtagNamesSet.has(name)
-        )
+        const hashtagNamesToDelete = [...differenceBetweenSets(
+          oldHashtagNamesSet,
+          hashtagNamesSet
+        )]
 
-        const RecipeHashtagKeysToDelete = deletedHashtagNames.map((name) => [
+        const RecipeHashtagKeysToDelete = hashtagNamesToDelete.map((name) => [
           recipe.id,
           name,
         ])
@@ -92,15 +97,13 @@ export default async (
       // Удалить из таблицы связи все ингридиенты,
       // которые исчезли из ingredientList
       if (recipeId) {
-        // const oldIngredientIdSet = new Set(
-        //   oldIngredientList.value.map((item) => item.id),
-        // )
+        const IdsToDelete = [...differenceBetweenSets(
+          oldIngredientIdSet,
+          newIngredientIdSet
+        )]
 
-        const deletedIds = [...oldIngredientIdSet]
-          .filter((name) => !newIngredientIdSet.has(name))
-
-        if (deletedIds.length) {
-          const recipeIngredientKeysToDelete = deletedIds.map(
+        if (IdsToDelete.length) {
+          const recipeIngredientKeysToDelete = IdsToDelete.map(
             (ingredientId) => [recipe.id, ingredientId]
           )
 
@@ -109,8 +112,6 @@ export default async (
       }
 
       // Заполняем пустые ID для новых ингредиентов и их единиц измерения
-      console.log('ingredientList: ', [...ingredientList]);
-
       const ingredientsWithoutIdList = [...ingredientList]
         .map((item) => ({
           id: item.ingredient.id,
@@ -118,13 +119,10 @@ export default async (
         }))
         .filter((item) => !item.id)
 
-      console.log('ingredientsWithoutIdList: ', [...ingredientsWithoutIdList]);
-
       const unitsWithoutIdList = [...ingredientList]
         .map((item) => ({ id: item.unit.id, name: item.unit.name }))
         .filter((item) => !item.id)
 
-      console.log('unitsWithoutIdList: ', [...unitsWithoutIdList]);
       const tasks = []
 
       let ingredientTaskIndex = 0
@@ -197,5 +195,6 @@ export default async (
   return {
     oldHashtagNamesSet: hashtagNamesSet,
     oldIngredientIdSet: newIngredientIdSet,
+    recipeId: recipe.id,
   }
 }

@@ -3,17 +3,35 @@ import type { Table, Observable } from 'dexie';
 import type { Ref } from 'vue'
 import { Themes } from '@/types/Themes'
 import { useObservable } from '@vueuse/rxjs'
+import differenceBetweenSets from '@/helpers/differenceBetweenSets'
 
 export interface ISettings { // Здесь пока только один параметр
   id?: number, // Всегда используется строка с id === 1
   theme?: Themes,
+  openedRecipeId?: number | null,
   dbInitCompleted?: boolean,
+  searchInTrash?: boolean,
 }
+
+export class SettingsDatabase extends Dexie {
+  settings!: Table<ISettings>
+
+  constructor() {
+    super('SettingsDatabase')
+
+    this.version(1).stores({
+      settings: '&id, theme, openedRecipeId, searchInTrash',
+    })
+  }
+}
+
+export const dbs = new SettingsDatabase()
 
 export interface IRecipe {
   id?: number,
   name: string,
   content: string,
+  note: string,
   deletionDate?: number | null,
 }
 
@@ -49,20 +67,7 @@ export interface IRecipe_Ingredient {
   quantity: number,
 }
 
-const schema = {
-  settings: '++id, theme',
-  recipes: '++id, name, content, deletionDate',
-  hashtags: '&name',
-  recipe_hashtag: '&[recipeId+hashtagName], recipeId, hashtagName',
-  hashtagExps: '++id, name, hashtagExp',
-  ingredients: '++id, name',
-  ingredientUnits: '++id, name',
-  recipe_ingredient: '&[recipeId+ingredientId],'
-    + ' recipeId, ingredientId, unitId',
-}
-
 export class RecipesDatabase extends Dexie {
-  settings!: Table<ISettings>
   recipes!: Table<IRecipe>
   hashtags!: Table<IHashtag>
   recipe_hashtag!: Table<IRecipe_hashtag>
@@ -74,7 +79,16 @@ export class RecipesDatabase extends Dexie {
   constructor() {
     super('RecipesDatabase')
 
-    this.version(1).stores(schema)
+    this.version(1).stores({
+      recipes: '++id, name, content, note, deletionDate',
+      hashtags: '&name',
+      recipe_hashtag: '&[recipeId+hashtagName], recipeId, hashtagName',
+      hashtagExps: '++id, name, hashtagExp',
+      ingredients: '++id, name',
+      ingredientUnits: '++id, name',
+      recipe_ingredient: '&[recipeId+ingredientId],'
+        + ' recipeId, ingredientId, unitId',
+    })
   }
 }
 
@@ -86,50 +100,68 @@ export const observableQuery = <T>(query: () => Promise<T>): Ref<T> => {
 
 
 const loadStaticData = async () => {
-  const settingsData = (await db.settings.where({ id: 1 }).first())
-  console.log('settingsData: ', settingsData);
+  const settingsData = (await dbs.settings.where({ id: 1 }).first())
   const dbInitCompleted = settingsData?.dbInitCompleted
-  console.log('dbInitCompleted: ', dbInitCompleted);
 
   if (!dbInitCompleted) {
     try {
       await db.transaction(
         'rw',
         [
-          'settings',
           'ingredients',
           'ingredientUnits',
         ],
         async () => {
-          await db.ingredients.bulkPut([
-            { name: 'творог' },
-            { name: 'творожная масса' },
-            { name: 'тесто слоёное' },
-            { name: 'сметана' },
-            { name: 'сыр' },
-            { name: 'яйца' },
-            { name: 'кефир' },
+          const baseIngredientsSet = new Set([
+            'творог',
+            'творожная масса',
+            'тесто слоёное',
+            'сметана',
+            'сыр',
+            'яйца',
+            'кефир',
           ])
 
-          await db.ingredientUnits.bulkPut([
-            { name: 'г' },
-            { name: 'кг' },
-            { name: 'л' },
-            { name: 'ст. лож.' },
-            { name: 'ч. лож.' },
-            { name: 'на вкус' },
-            { name: 'для смазывания' },
-            { name: 'шт.' },
-            { name: 'щепотка' },
+          const ingredientsPresentSet = new Set(((
+            await db.ingredients.toArray()
+          ) ?? []).map((item) => item.name))
+
+          const savedIngredients = [...differenceBetweenSets(
+            baseIngredientsSet,
+            ingredientsPresentSet
+          )].map((item) => ({ name: item }))
+
+          await db.ingredients.bulkPut(savedIngredients)
+
+          const baseIngredientsUnitsSet = new Set([
+            'г',
+            'кг',
+            'л',
+            'ст. лож.',
+            'ч. лож.',
+            'на вкус',
+            'для смазывания',
+            'шт.',
+            'щепотка',
           ])
 
-          const payload = { ...settingsData, id: 1, dbInitCompleted: true }
-          console.log('payload: ', payload);
-          await db.settings.put(payload)
+          const ingredientsUnitsPresentSet = new Set(((
+            await db.ingredientUnits.toArray()
+          ) ?? []).map((item) => item.name))
+
+          const savedIngredientUnits = [...differenceBetweenSets(
+            baseIngredientsUnitsSet,
+            ingredientsUnitsPresentSet
+          )].map((item) => ({ name: item }))
+
+          await db.ingredientUnits.bulkPut(savedIngredientUnits)
         }
       )
 
-      console.log('База успешно инициирована')
+      const payload = { ...settingsData, id: 1, dbInitCompleted: true }
+      await dbs.settings.put(payload)
+
+      console.log('RecipesDatabase успешно инициализирована')
     } catch (err) {
       console.error(err)
     }

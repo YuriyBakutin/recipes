@@ -1,11 +1,16 @@
 <script setup lang="ts">
-  const props = defineProps<{
-    name: string
-  }>()
+  const props = withDefaults(
+    defineProps<{
+      name: string
+      clickable?: boolean
+    }>(),
+    {
+      clickable: false,
+    },
+  )
 
   const content = ref('' as any)
   const iconEnvelope = ref(null)
-  const clickable = ref(false)
 
   const getContent = async () => {
     content.value =
@@ -16,21 +21,14 @@
 
   onMounted(async () => {
     await getContent()
-
-    const observer = new MutationObserver(() => {
-      clickable.value = iconEnvelope.value.classList.contains('cursor-pointer')
-    })
-
-    observer.observe(iconEnvelope.value, { attributes: true })
-    clickable.value = iconEnvelope.value.classList.contains('cursor-pointer')
   })
 </script>
 <template>
   <button
-    :disabled="!clickable"
+    :disabled="!props.clickable"
     ref="iconEnvelope"
     class="icon-button inline-flex justify-center items-center text-center"
-    :class="{ clickable }"
+    :class="{ 'clickable cursor-pointer': props.clickable }"
     v-html="content"
   />
 </template>

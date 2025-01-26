@@ -76,9 +76,9 @@
 <template>
   <div class="relative p-0">
     <Icon
-      tabindex="0"
       name="down"
-      class="text-24 text-primary absolute left-2 top-1 z-10 cursor-pointer"
+      :clickable="true"
+      class="text-24 text-primary absolute left-2 top-1 z-10"
       @click="onNumberStep(-1)"
     />
     <van-field
@@ -91,7 +91,8 @@
     />
     <Icon
       name="up"
-      class="text-24 text-primary absolute right-2 top-1 cursor-pointer"
+      :clickable="true"
+      class="text-24 text-primary absolute right-2 top-1"
       @click="onNumberStep(1)"
     />
   </div>

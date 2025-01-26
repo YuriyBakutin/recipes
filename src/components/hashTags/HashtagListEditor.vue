@@ -16,6 +16,7 @@
 
   const props = defineProps<{
     modelValue?: string[]
+    editing: boolean
     error?: boolean
   }>()
 
@@ -24,10 +25,10 @@
   const fieldElem = ref(null)
   const inputElem = ref(null)
 
-  const getCursorPosition = () => inputElem.value.selectionStart
+  const getCursorPosition = () => inputElem.value?.selectionStart
 
   const setCursorPosition = (newPosition: number) => {
-    inputElem.value.setSelectionRange(newPosition, newPosition)
+    inputElem.value?.setSelectionRange(newPosition, newPosition)
   }
 
   // Обработчик события вставки из буфера обмена
@@ -74,6 +75,7 @@
 
       watchEvent = false
     },
+    { immediate: true },
   )
 
   const insertCharToStringWithHashtag = (char: string) => {
@@ -85,8 +87,11 @@
   }
 
   const onKeypress = async (event: KeyboardEvent) => {
-    keypressEvent = true // Признак для блокировки watch newHashtag
+    if (!inputElem.value) {
+      inputElem.value = fieldElem.value.$el.querySelector('input')
+    }
 
+    keypressEvent = true // Признак для блокировки watch newHashtag
     let char = event.key
 
     if (char === 'Enter') {
@@ -125,12 +130,16 @@
   const editHashtag = (index: number) => {
     const hashtagList = props.modelValue as string[]
 
-    newHashtag.value = hashtagList[index]
+    keypressEvent = true
+    const selectedHashtag = hashtagList[index] + ''
+    newHashtag.value = selectedHashtag
 
-    emit('update:modelValue', [
+    const newHashtagList = [
       ...hashtagList.slice(0, index),
       ...hashtagList.slice(index + 1),
-    ])
+    ]
+
+    emit('update:modelValue', newHashtagList)
   }
 
   const addHashtag = () => {
@@ -146,13 +155,9 @@
     emit('update:modelValue', newHashtags)
     newHashtag.value = ''
   }
-
-  onMounted(() => {
-    inputElem.value = fieldElem.value.$el.querySelector('input')
-  })
 </script>
 <template>
-  <div class="w-full flex flex-col mt-12">
+  <div class="w-full flex flex-col">
     <div class="w-full min-h-20 flex flex-wrap van-padding-left">
       <span class="font-bold text-primary">Хештеги:&nbsp;</span>
       <template v-if="props.modelValue?.length">
@@ -172,15 +177,12 @@
         >— добавьте хештеги, чтобы этот рецепт потом было легче найти.</span
       >
     </div>
-    <div class="w-full flex items-center van-padding-left">
+    <div v-if="editing" class="w-full flex items-center van-padding-left">
       <Icon
         name="save-up"
+        :clickable="!!newHashtag"
         class="text-24"
-        :class="
-          !newHashtag ?
-            'opacity-[0.5] text-inactive'
-          : 'cursor-pointer text-primary'
-        "
+        :class="!newHashtag ? 'opacity-[0.5] text-inactive' : 'text-primary'"
         @click="addHashtag"
       />
       <div class="relative w-full">
@@ -192,12 +194,9 @@
         />
         <Icon
           name="close"
+          :clickable="!!newHashtag"
           class="absolute right-0 top-0 bottom-0 text-24 align-middle van-padding-right"
-          :class="
-            !newHashtag ?
-              'opacity-[0.5] text-inactive'
-            : 'cursor-pointer text-primary'
-          "
+          :class="!newHashtag ? 'opacity-[0.5] text-inactive' : 'text-primary'"
           @click="newHashtag = ''"
         />
       </div>

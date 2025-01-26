@@ -15,7 +15,8 @@
 
   const props = withDefaults(
     defineProps<{
-      recipeId?: number
+      modelValue: IIngredientInRecipeItem[]
+      editing: boolean
       showError?: boolean
     }>(),
     {
@@ -26,37 +27,15 @@
   const loading = ref(false)
   const ingredientList = ref([] as IIngredientInRecipeItem[])
 
-  const ingredientHiddenItemList = computed(() =>
-    ingredientList.value.map((ingredient) => ingredient.ingredient.name),
+  watch(
+    () => props.modelValue,
+    () => {
+      ingredientList.value = props.modelValue
+    },
   )
 
-  watch(
-    () => props.recipeId,
-    async () => {
-      if (!props.recipeId) {
-        return
-      }
-
-      loading.value = true
-
-      ingredientList.value = await db.recipe_ingredient
-        .where({ recipeId: props.recipeId })
-        .toArray(async (item) => {
-          const result = await Dexie.Promise.all([
-            db.ingredients.get({ id: item.ingredientId }),
-            db.ingredientUnits.get({ id: item.unitId }),
-          ])
-
-          return {
-            ingredient: { id: item.ingredientId, name: result[0].name },
-            quantity: item.quantity,
-            unit: { id: item.unitId, name: result[1].name },
-          }
-        })
-
-      emit('ingredientListInit', ingredientList.value)
-      loading.value = false
-    },
+  const ingredientHiddenItemList = computed(() =>
+    ingredientList.value.map((ingredient) => ingredient.ingredient.name),
   )
 
   const editedIngredient = ref(getEmptyIngredient())
@@ -79,30 +58,37 @@
 </script>
 <template>
   <div
-    class="van-padding grid grid-cols-[5fr_1fr_5fr_24px] gap-x-16 gap-y-14 relative"
+    class="grid relative"
+    :class="
+      editing ?
+        'grid-cols-[4fr_1fr_4fr_minmax(48px,48px)]'
+      : 'grid-cols-[4fr_1fr_4fr]'
+    "
   >
     <div class="contents text-primary font-bold">
-      <div>Ингредиент</div>
-      <div>Кол-во</div>
-      <div>Ед. изм.</div>
+      <div class="pr-5 py-5 van-padding-left">Ингредиент</div>
+      <div class="p-5">Кол-во</div>
+      <div class="p-5">Ед. изм.</div>
     </div>
-    <div class="w-24"></div>
+    <div v-if="editing" class="w-24 van-padding-right"></div>
     <template v-if="ingredientList?.length">
       <IngredientListItem
         v-for="(ingredient, index) in ingredientList ?? []"
         :key="ingredient.ingredientName"
         :ingredient="ingredient"
         :index="index"
+        :editing="editing"
         @edit="editIngredient"
       />
     </template>
     <IngredientDataInput
+      v-if="editing"
       :ingredientItem="editedIngredient"
       :ingredientHiddenItemList="ingredientHiddenItemList"
       @add="addIngredient"
     />
     <div
-      v-if="props.showError && !ingredientList.length"
+      v-if="props.showError && !ingredientList.length && editing"
       class="absolute left-0 bottom-0 -mb-12 van-padding-left text-error"
     >
       Добавьте ингредиенты.

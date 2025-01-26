@@ -23,6 +23,7 @@ export default defineConfig({
         'src/components/tabs',
         'src/components/common',
         'src/components/hashTags',
+        'src/components/search',
       ],
       dts: true,
     }),

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { db, observableQuery } from '@/db'
+  import { db, dbs, observableQuery } from '@/db'
   import { Themes } from '@/types/Themes'
   import { Colors, colorsInit } from '@/data/Colors'
   import SearchTab from '@/components/tabs/SearchTab.vue'
@@ -37,14 +37,21 @@
   const currentTitle = computed(() => tabOptions[currentTabName.value].title)
 
   const theme = observableQuery(async () => {
-    return (await db.settings.get({ id: 1 }))?.theme ?? Themes.light
+    return (await dbs.settings.get({ id: 1 }))?.theme ?? Themes.light
   })
 
-  const changeTheme = (newTheme?: Themes) => {
-    if (newTheme) {
-      theme.value = newTheme
-    }
-  }
+  const recipeId = observableQuery(async () => {
+    return (await dbs.settings.get({ id: 1 }))?.openedRecipeId
+  })
+
+  watch(
+    () => recipeId.value,
+    () => {
+      if (recipeId.value) {
+        currentTabName.value = 'recipe'
+      }
+    },
+  )
 
   onMounted(() => {
     colorsInit()
@@ -85,12 +92,7 @@
     </van-tabbar>
     <KeepAlive>
       <div class="main-block overflow-y-auto">
-        <h1
-          class="w-full text-center font-bold text-18 text-primary mt-10 mb-14"
-        >
-          {{ currentTitle }}
-        </h1>
-        <component :is="currentTabComponent" @changeTheme="changeTheme" />
+        <component :is="currentTabComponent" />
       </div>
     </KeepAlive>
   </van-config-provider>

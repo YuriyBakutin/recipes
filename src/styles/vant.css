@@ -1,6 +1,6 @@
 body {
   @apply h-screen m-0 p-0 text-14 bg-orange-1;
-  font-family: "Inter";
+  font-family: 'Inter';
 }
 
 .van-theme-dark body {
@@ -11,6 +11,7 @@ body {
   padding: var(--van-cell-vertical-padding) var(--van-cell-horizontal-padding);
 }
 
-.van-padding-left {
-  padding-left: var(--van-cell-horizontal-padding)
+.van-padding-x {
+  padding-left: var(--van-cell-horizontal-padding);
+  padding-right: var(--van-cell-horizontal-padding);
 }

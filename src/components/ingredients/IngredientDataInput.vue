@@ -106,6 +106,7 @@
     :accepted="unacceptedFields.ingredient"
     :hiddenItemList="ingredientHiddenItemList"
     :focusRequest="focusRequest"
+    class="mt-16 mr-5 van-padding-left"
     @focused="onFocused"
     @select="onNewIngredientFieldSelect($event, 'ingredient')"
     @setUnaccepted="onSetUnaccepted('ingredient')"
@@ -113,6 +114,7 @@
   <QuantityField
     v-model="newIngredientItem.quantity"
     :error="quantityIsInvalid"
+    class="mt-16 mx-5"
   />
   <AutocompleteField
     placeholder="Ед. изм."
@@ -121,17 +123,15 @@
     :showPopupOnFocus="true"
     dbTableName="ingredientUnits"
     :accepted="unacceptedFields.unit"
+    class="mt-16 mx-5"
     @select="onNewIngredientFieldSelect($event, 'unit')"
     @setUnaccepted="onSetUnaccepted('unit')"
   />
   <Icon
     name="save-up"
-    class="text-24"
-    :class="
-      !readyAddToList ?
-        'opacity-[0.5] text-inactive'
-      : 'cursor-pointer text-primary'
-    "
+    :clickable="readyAddToList"
+    class="text-24 mt-16 van-padding-right"
+    :class="!readyAddToList ? 'opacity-[0.5] text-inactive' : 'text-primary'"
     @click.prevent.stop="addIngredient"
   />
 </template>

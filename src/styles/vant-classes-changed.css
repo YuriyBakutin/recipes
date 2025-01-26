@@ -122,3 +122,7 @@
 .van-theme-dark .text-primary {
   color: var(--van-orange-3);
 }
+
+.number-field .van-field__value {
+  min-width: 110px;
+}

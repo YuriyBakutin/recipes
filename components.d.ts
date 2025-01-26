@@ -22,8 +22,10 @@ declare module 'vue' {
     IngredientListItem: typeof import('./src/components/ingredients/IngredientListItem.vue')['default']
     QuantityField: typeof import('./src/components/common/QuantityField.vue')['default']
     Recipe: typeof import('./src/components/Recipe.vue')['default']
+    RecipesSearchItem: typeof import('./src/components/search/RecipesSearchItem.vue')['default']
     RecipeTab: typeof import('./src/components/tabs/RecipeTab.vue')['default']
     SearchTab: typeof import('./src/components/tabs/SearchTab.vue')['default']
     SettingsTab: typeof import('./src/components/tabs/SettingsTab.vue')['default']
+    SimpleButton: typeof import('./src/components/common/SimpleButton.vue')['default']
   }
 }

@@ -1,17 +1,20 @@
 <script lang="ts">
-  import { db, observableQuery } from '@/db'
+  import { dbs, observableQuery } from '@/db'
   import { Themes } from '@/types/Themes'
 </script>
 <script lang="ts" setup>
   const theme = observableQuery(async () => {
-    return (await db.settings.get({ id: 1 }))?.theme ?? Themes.light
+    return (await dbs.settings.get({ id: 1 }))?.theme ?? Themes.light
   })
 
   const changeTheme = async () => {
-    await db.settings.update(1, { theme: theme.value })
+    await dbs.settings.update(1, { theme: theme.value })
   }
 </script>
 <template>
+  <h1 class="w-full text-center font-bold text-18 text-primary mt-10 mb-14">
+    Настройки
+  </h1>
   <div class="van-hairline--bottom pt-10 pb-20">
     <h1 class="text-14 ml-40">Тема</h1>
     <van-radio-group

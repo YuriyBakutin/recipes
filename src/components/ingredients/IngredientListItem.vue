@@ -6,16 +6,28 @@
 
   const props = defineProps<{
     ingredient: IIngredientInRecipeItem
+    editing: boolean
     index: number
   }>()
+
+  const odd = computed(() => !(props.index % 2))
 </script>
 <template>
-  <div>{{ props.ingredient.ingredient.name }}</div>
-  <div>{{ props.ingredient.quantity }}</div>
-  <div>{{ props.ingredient.unit.name }}</div>
+  <div class="pr-5 py-5 van-padding-left" :class="{ 'bg-[#00000022]': odd }">
+    {{ props.ingredient.ingredient.name }}
+  </div>
+  <div class="p-5" :class="{ 'bg-[#00000022]': odd }">
+    {{ props.ingredient.quantity }}
+  </div>
+  <div class="p-5" :class="{ 'bg-[#00000022]': odd }">
+    {{ props.ingredient.unit.name }}
+  </div>
   <Icon
+    v-if="editing"
     name="edit"
-    class="text-16 text-primary cursor-pointer"
+    :clickable="true"
+    class="text-16 text-primary cursor-pointer pl-5 van-padding-right"
+    :class="{ 'bg-[#00000022]': odd }"
     @click="emit('edit', props.index)"
   />
 </template>

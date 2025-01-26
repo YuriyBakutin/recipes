@@ -142,7 +142,7 @@
           break
         case 'PageUp':
         case 'PageDown':
-          // TODO: Здесь для выпадающего списка
+          // TODO Здесь для выпадающего списка
           // должна быть перемотка на один вьюпорт
           break
         case 'ArrowUp':
