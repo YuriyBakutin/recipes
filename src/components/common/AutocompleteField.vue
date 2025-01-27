@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Collection, IndexableType } from 'dexie'
   import { db } from '@/db'
-  import type { IIngredient, IIngredientUnit } from '@/db'
+  import type { AnyDbTable, AnyDbTableType } from '@/db'
 
   // const movingKeys = ['ArrowRight', 'ArrowLeft', 'Home', 'End']
 
@@ -22,7 +22,7 @@
       text?: string
       placeholder?: string
       error?: boolean
-      dbTableName: 'ingredients' | 'ingredientUnits'
+      dbTableName: AnyDbTable
       keyName?: string
       showPopupOnFocus?: boolean
 
@@ -71,9 +71,9 @@
 
   const fieldEventHandler = async () => {
     let collection = db[props.dbTableName] as unknown as Collection<
-      IIngredient | IIngredientUnit,
+      AnyDbTableType,
       IndexableType,
-      IIngredient | IIngredientUnit
+      AnyDbTableType
     >
 
     if (!props.showPopupOnFocus || text.value.length) {

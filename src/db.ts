@@ -67,6 +67,23 @@ export interface IRecipe_Ingredient {
   quantity: number,
 }
 
+const scheme = {
+  recipes: '++id, name, content, note, deletionDate',
+  hashtags: '&name',
+  recipe_hashtag: '&[recipeId+hashtagName], recipeId, hashtagName',
+  hashtagExps: '++id, name, hashtagExp',
+  ingredients: '++id, name',
+  ingredientUnits: '++id, name',
+  recipe_ingredient: '&[recipeId+ingredientId],'
+    + ' recipeId, ingredientId, unitId',
+}
+
+export type AnyDbTable = keyof typeof scheme
+export type AnyDbTableType =
+  IRecipe | IHashtag | IRecipe_hashtag | IHashtagExp |
+  IIngredient | IIngredientUnit | IRecipe_Ingredient
+
+
 export class RecipesDatabase extends Dexie {
   recipes!: Table<IRecipe>
   hashtags!: Table<IHashtag>
@@ -79,16 +96,7 @@ export class RecipesDatabase extends Dexie {
   constructor() {
     super('RecipesDatabase')
 
-    this.version(1).stores({
-      recipes: '++id, name, content, note, deletionDate',
-      hashtags: '&name',
-      recipe_hashtag: '&[recipeId+hashtagName], recipeId, hashtagName',
-      hashtagExps: '++id, name, hashtagExp',
-      ingredients: '++id, name',
-      ingredientUnits: '++id, name',
-      recipe_ingredient: '&[recipeId+ingredientId],'
-        + ' recipeId, ingredientId, unitId',
-    })
+    this.version(1).stores(scheme)
   }
 }
 
