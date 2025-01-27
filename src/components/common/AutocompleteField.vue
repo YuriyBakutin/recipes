@@ -160,18 +160,21 @@
           // должна быть перемотка на один вьюпорт
           break
         case 'ArrowUp':
-          selectedItemIndex.value > 0 ? selectedItemIndex.value-- : null
+          if (selectedItemIndex.value > 0) {
+            selectedItemIndex.value--
+          }
+
           break
         case 'ArrowDown':
-          (
+          if (
             itemList.value?.length &&
             selectedItemIndex.value < itemList.value.length - 1
-          ) ?
+          ) {
             selectedItemIndex.value++
-          : null
+          }
+
           break
         case 'Enter':
-          event.preventDefault()
           if (selectedItemIndex.value >= 0) {
             acceptItem(itemList.value[selectedItemIndex.value])
           } else {
