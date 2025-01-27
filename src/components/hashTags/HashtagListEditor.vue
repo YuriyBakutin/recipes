@@ -22,7 +22,7 @@
 
   const newHashtag = ref('')
   const cursorPosition = ref(0)
-  const fieldElem = ref(null)
+  const fieldComponent = ref(null)
   const inputElem = ref(null)
 
   const getCursorPosition = () => inputElem.value?.selectionStart
@@ -88,7 +88,7 @@
 
   const onKeypress = async (event: KeyboardEvent) => {
     if (!inputElem.value) {
-      inputElem.value = fieldElem.value.$el.querySelector('input')
+      inputElem.value = fieldComponent.value.$el.querySelector('input')
     }
 
     keypressEvent = true // Признак для блокировки watch newHashtag
@@ -188,8 +188,8 @@
       <div class="relative w-full">
         <van-field
           v-model="newHashtag"
+          ref="fieldComponent"
           placeholder="#Добавить хештег"
-          ref="fieldElem"
           @keypress.prevent="onKeypress"
         />
         <Icon
