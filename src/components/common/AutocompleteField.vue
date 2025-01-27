@@ -15,7 +15,7 @@
   ]
 </script>
 <script lang="ts" setup>
-  const emit = defineEmits(['focused', 'select', 'setUnaccepted'])
+  const emit = defineEmits(['focused', 'select', 'setUnaccepted', 'cleared'])
 
   const props = withDefaults(
     defineProps<{
@@ -34,6 +34,7 @@
 
       // При переходе в true переключает фокус страницы на поле ввода
       focusRequest?: boolean
+      cleaning?: boolean
     }>(),
     {
       placeholder: '',
@@ -44,12 +45,23 @@
       showPopupOnFocus: false,
       hiddenItemList: [],
       focusRequest: false,
+      cleaning: false,
     },
   )
 
   const text = ref('')
   const fieldComponent = ref(null)
   const inputElem = ref(null)
+
+  watch(
+    () => props.cleaning,
+    () => {
+      if (props.cleaning) {
+        text.value = ''
+        emit('cleared')
+      }
+    },
+  )
 
   watch(
     () => props.text,

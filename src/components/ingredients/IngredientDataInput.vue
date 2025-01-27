@@ -17,15 +17,17 @@
   const DEFAULT_QUANTITY = 1
 </script>
 <script lang="ts" setup>
-  const emit = defineEmits(['add'])
+  const emit = defineEmits(['add', 'cleared'])
 
   const props = withDefaults(
     defineProps<{
       ingredientItem: IIngredientInRecipeItem
       ingredientHiddenItemList?: string[]
+      cleaning?: boolean
     }>(),
     {
       ingredientHiddenItemList: [],
+      cleaning: false,
     },
   )
 
@@ -107,6 +109,8 @@
     :hiddenItemList="ingredientHiddenItemList"
     :focusRequest="focusRequest"
     class="mt-16 mr-5 van-padding-left"
+    :cleaning="props.cleaning"
+    @cleared="emit('cleared')"
     @focused="onFocused"
     @select="onNewIngredientFieldSelect($event, 'ingredient')"
     @setUnaccepted="onSetUnaccepted('ingredient')"
@@ -124,6 +128,8 @@
     dbTableName="ingredientUnits"
     align="right"
     class="mt-16 mx-5"
+    :cleaning="props.cleaning"
+    @cleared="emit('cleared')"
     @select="onNewIngredientFieldSelect($event, 'unit')"
     @setUnaccepted="onSetUnaccepted('unit')"
   />

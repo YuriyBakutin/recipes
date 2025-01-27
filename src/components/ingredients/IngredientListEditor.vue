@@ -11,16 +11,22 @@
     }) as IIngredientInRecipeItem
 </script>
 <script lang="ts" setup>
-  const emit = defineEmits(['update:modelValue', 'ingredientListInit'])
+  const emit = defineEmits([
+    'update:modelValue',
+    'ingredientListInit',
+    'cleared',
+  ])
 
   const props = withDefaults(
     defineProps<{
       modelValue: IIngredientInRecipeItem[]
       editing: boolean
       showError?: boolean
+      cleaning?: boolean
     }>(),
     {
       showError: false,
+      cleaning: false,
     },
   )
 
@@ -85,7 +91,9 @@
       v-if="editing"
       :ingredientItem="editedIngredient"
       :ingredientHiddenItemList="ingredientHiddenItemList"
+      :cleaning="props.cleaning"
       @add="addIngredient"
+      @cleared="emit('cleared')"
     />
     <div
       v-if="props.showError && !ingredientList.length && editing"

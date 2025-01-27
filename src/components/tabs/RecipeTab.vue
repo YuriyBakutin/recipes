@@ -15,6 +15,13 @@
   const loading = ref(false)
   const submitted = ref(false)
   const editing = ref(false)
+  const cleaning = ref(false)
+
+  const onCleared = async () => {
+    await nextTick()
+
+    cleaning.value = false
+  }
 
   const hashtags = ref([] as INameWithId[])
   const hashtagError = computed(() => !hashtags.value.length)
@@ -150,6 +157,9 @@
     ingredientList.value = []
     content.value = ''
     note.value = ''
+    oldHashtagNamesSet = new Set()
+    oldIngredientIdSet = new Set()
+    cleaning.value = true
   }
 </script>
 <template>
@@ -185,12 +195,16 @@
       v-model="hashtags"
       :editing="editing || !recipe"
       :error="hashtagError && submitted"
+      :cleaning="cleaning"
+      @cleared="onCleared"
     />
     <IngredientListEditor
       v-model="ingredientList"
       :editing="editing || !recipe"
       :recipeId="recipeId"
       :showError="submitted"
+      :cleaning="cleaning"
+      @cleared="onCleared"
       @ingredientListInit="oldIngredientList = $event"
     />
     <div>

@@ -25,15 +25,33 @@
   ]
 </script>
 <script lang="ts" setup>
-  const emit = defineEmits(['update:modelValue'])
+  const emit = defineEmits(['update:modelValue', 'cleared'])
 
-  const props = defineProps<{
-    modelValue?: INameWithId[]
-    editing: boolean
-    error?: boolean
-  }>()
+  const props = withDefaults(
+    defineProps<{
+      modelValue?: INameWithId[]
+      editing: boolean
+      error?: boolean
+      cleaning?: boolean
+    }>(),
+    {
+      error: false,
+      cleaning: false,
+    },
+  )
 
   const newHashtagName = ref('')
+
+  watch(
+    () => props.cleaning,
+    () => {
+      if (props.cleaning) {
+        newHashtagName.value = ''
+        emit('cleared')
+      }
+    },
+  )
+
   const cursorPosition = ref(0)
   const fieldComponent = ref(null)
   const inputElem = ref(null)
