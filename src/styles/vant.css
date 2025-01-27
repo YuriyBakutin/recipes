@@ -15,3 +15,20 @@ body {
   padding-left: var(--van-cell-horizontal-padding);
   padding-right: var(--van-cell-horizontal-padding);
 }
+
+.van-padding-right {
+  padding-right: var(--van-cell-horizontal-padding);
+}
+
+.van-padding-left,
+.van-field__button {
+  padding-left: var(--van-cell-horizontal-padding);
+}
+
+.van-margin-right {
+  margin-right: var(--van-cell-horizontal-padding);
+}
+
+.van-margin-left {
+  margin-left: var(--van-cell-horizontal-padding);
+}

@@ -1,7 +1,7 @@
 import Dexie from 'dexie'
 import { db } from '@/db'
 import type { IRecipe, IRecipe_Ingredient } from '@/db'
-import type { IIngredientInRecipeItem } from '@/types/IIngredientInRecipeItem'
+import type { INameWithId, IIngredientInRecipeItem } from '@/types/IIngredientInRecipeItem'
 import differenceBetweenSets from '@/helpers/differenceBetweenSets'
 
 export default async (
@@ -10,7 +10,7 @@ export default async (
     recipeName: string,
     content: string,
     note: string,
-    hashtagNames: string[],
+    hashtags: INameWithId[],
     oldHashtagNamesSet: Set<string>,
     oldIngredientIdSet: Set<number>,
     ingredientList: IIngredientInRecipeItem[],
@@ -21,7 +21,7 @@ export default async (
     recipeName,
     content,
     note,
-    hashtagNames,
+    hashtags,
     oldHashtagNamesSet,
     oldIngredientIdSet,
     ingredientList,
@@ -37,6 +37,7 @@ export default async (
     recipe.id = recipeId
   }
 
+  const hashtagNames = hashtags.map((item) => item.name)
   const hashtagNamesSet = new Set(hashtagNames)
 
   const newIngredientIdSet = new Set(
@@ -64,29 +65,62 @@ export default async (
       // отдельная операция по инициализации таблицы хештегов теми хештегами,
       // которые используются в других таблицах (запускать её при старте).
 
-      // Скинуть в базу все хештеги. Старые просто перепишутся такими же.
-      await db.hashtags.bulkPut(hashtagNames.map((name) => ({ name })))
+      // FIXME (Скинуть в базу все хештеги. Старые просто перепишутся такими же.)
+
+      const alreadyAvailableHashtag = await db.hashtags
+        .where('name')
+        .anyOf(hashtagNames)
+        .toArray()
+
+      const alreadyAvailableHashtagSet = new Set(
+        alreadyAvailableHashtag.map((item) => item.name)
+      )
+
+      const newHashtagNames = [
+        ...differenceBetweenSets(hashtagNamesSet, alreadyAvailableHashtagSet)
+      ]
+
+      const newHashtagIds = await db.hashtags.bulkPut(
+        newHashtagNames.map((name) => ({ name })), { allKeys: true }
+      ) as number[]
+
+      const newHashtags = [] as INameWithId[]
+
+      for (let index = 0; index < newHashtagNames.length; index++) {
+        newHashtags.push(
+          { id: newHashtagIds[index], name: newHashtagNames[index] }
+        )
+      }
 
       //  Удалить из таблицы связи все, которые исчезли из списка хештегов
-      if (recipeId) {
-        const hashtagNamesToDelete = [...differenceBetweenSets(
-          oldHashtagNamesSet,
-          hashtagNamesSet
-        )]
+      const hashtagNamesToDelete = [...differenceBetweenSets(
+        oldHashtagNamesSet,
+        hashtagNamesSet
+      )]
 
-        const RecipeHashtagKeysToDelete = hashtagNamesToDelete.map((name) => [
+      if (hashtagNamesToDelete.length) {
+        const hashtagIdsToDelete = await db.hashtags
+          .where('name')
+          .anyOf(hashtagNamesToDelete)
+          .toArray()
+
+        const RecipeHashtagKeysToDelete = hashtagIdsToDelete.map((id) => [
           recipe.id,
-          name,
+          id,
         ])
 
         await db.recipe_hashtag.bulkDelete(RecipeHashtagKeysToDelete)
       }
 
       //  Добавить в таблицу связи все новые хештеги
+      const hashtagIds = [
+        ...alreadyAvailableHashtag.map((item) => item.id),
+        ...newHashtagIds,
+      ]
 
-      const recipeHashtagToSave = hashtagNames.map((name) => ({
-        hashtagName: name,
+      const recipeHashtagToSave = hashtagIds.map((id) => ({
         recipeId: recipe.id as number,
+        hashtagId: id as number,
       }))
 
       if (recipeHashtagToSave.length) {

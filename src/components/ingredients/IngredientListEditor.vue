@@ -89,7 +89,7 @@
     />
     <div
       v-if="props.showError && !ingredientList.length && editing"
-      class="absolute left-0 bottom-0 -mb-12 van-padding-left text-error"
+      class="absolute left-0 top-0 mt-23 van-padding-left text-error"
     >
       Добавьте ингредиенты.
     </div>

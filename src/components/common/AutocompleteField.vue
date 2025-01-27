@@ -23,6 +23,8 @@
       placeholder?: string
       error?: boolean
       dbTableName: AnyDbTable
+      align?: 'left' | 'right'
+      margin?: boolean
       keyName?: string
       showPopupOnFocus?: boolean
 
@@ -36,6 +38,8 @@
     {
       placeholder: '',
       error: false,
+      align: 'left',
+      margin: false,
       keyName: 'name',
       showPopupOnFocus: false,
       hiddenItemList: [],
@@ -190,6 +194,18 @@
     },
   )
 
+  const popupClass = computed(() => {
+    let popupClass =
+      'absolute top-0 mt-40 max-h-300 min-w-200 ' +
+      'border-solid border-1 border-inactive rounded-4 bg-white ' +
+      'flex flex-col z-10 text-14 px-10 py-4 overflow-y-scroll '
+
+    popupClass += props.align + '-0'
+    popupClass += !!props.margin ? ' van-margin-' + props.align : ''
+
+    return popupClass
+  })
+
   onMounted(() => {
     inputElem.value = fieldComponent.value.$el.querySelector('input')
   })
@@ -221,11 +237,7 @@
         focused &&
         !accepted
       "
-      :class="
-        'absolute left-0 right-0 top-0 mt-40 max-h-300 min-w-200' +
-        ' border-solid border-1 border-inactive rounded-4 bg-white' +
-        ' flex flex-col z-10 text-14 px-10 py-4 overflow-y-scroll'
-      "
+      :class="popupClass"
     >
       <div
         v-for="(item, index) in itemList ?? []"

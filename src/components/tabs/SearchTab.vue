@@ -22,6 +22,7 @@
   const onOpenRecipe = async (recipeId) => {
     await dbs.settings.update(1, { openedRecipeId: recipeId })
   }
+
   onMounted(updateDbSearchInTrash)
 </script>
 <template>

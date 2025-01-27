@@ -22,18 +22,27 @@ export default async () => {
       db.recipe_ingredient.where('recipeId').equals(recipe.id as number).toArray(),
     ])
 
-    const hashtags = response[0] ?? []
-    const ingredients = response[1] ?? []
+    const recipeHashtags = response[0] ?? []
+    const recipeIngredients = response[1] ?? []
+
+    const hashtagIds = recipeHashtags.map((item) => {
+      return item.hashtagId
+    })
+
+    const hashtags = await db.hashtags
+      .where('id')
+      .anyOf(hashtagIds)
+      .toArray()
 
     const hashtagNames = hashtags.map((item) => {
-      return item.hashtagName
+      return item.name
     })
 
     const ingredientNames = [] as string[]
 
-    for (const ingredient of ingredients) {
+    for (const recipeIngredient of recipeIngredients) {
       const ingredientItem = (await db.ingredients.get({
-        id: ingredient.ingredientId,
+        id: recipeIngredient.ingredientId,
       })) as INameWithId
 
       ingredientNames.push(ingredientItem?.name)

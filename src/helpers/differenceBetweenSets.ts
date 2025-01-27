@@ -8,8 +8,8 @@ export default <T>(set1: Set<T>, set2: Set<T>): Set<T> => {
 }
 
 // TODO: Есть другой алгоритм:
-// <T>(set1: Set<T>, set2: Set<T>): Set<T> => [...oldHashtagNamesSet].filter(
-//   (name) => !hashtagNamesSet.has(name)
+// <T>(set1: Set<T>, set2: Set<T>): Set<T> => [...Set1].filter(
+//   (name) => !Set2.has(name)
 // )
 // Хорошо бы их сравнить по скорости.
 //

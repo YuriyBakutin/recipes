@@ -57,15 +57,6 @@
   margin: var(--van-cell-vertical-padding) var(--van-cell-horizontal-padding);
 }
 
-.van-padding-left,
-.van-field__button {
-  padding-left: var(--van-cell-horizontal-padding);
-}
-
-.van-padding-right {
-  padding-right: var(--van-cell-horizontal-padding);
-}
-
 .van-theme-dark .van-tabbar {
   background-color: var(--van-gray-9);
 }

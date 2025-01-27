@@ -16,8 +16,8 @@
   const submitted = ref(false)
   const editing = ref(false)
 
-  const hashtagNames = ref([] as string[])
-  const hashtagError = computed(() => !hashtagNames.value.length)
+  const hashtags = ref([] as INameWithId[])
+  const hashtagError = computed(() => !hashtags.value.length)
 
   const recipeName = ref('')
   const recipeNameError = computed(() => !recipeName.value)
@@ -55,7 +55,9 @@
       db.recipe_ingredient.where({ recipeId: recipeId.value }).toArray(),
     ])
 
-    hashtagNames.value = result[0]?.map((item) => item.hashtagName).sort() ?? []
+    const hashtagIds = result[0]?.map((item) => item.hashtagId)
+    hashtags.value = (await db.hashtags.bulkGet(hashtagIds)) ?? []
+
     const tasks = [] as Promise<INameWithId>[]
     const result1Length = result[1]?.length ?? 0
 
@@ -80,7 +82,7 @@
       a.ingredient.name.localeCompare(b.ingredient.name),
     )
 
-    oldHashtagNamesSet = new Set(hashtagNames.value)
+    oldHashtagNamesSet = new Set(hashtags.value.map((item) => item.name))
 
     oldIngredientIdSet = new Set(
       ingredientList.value.map((item) => item.ingredient.id),
@@ -117,7 +119,7 @@
         recipeName: recipeName.value,
         content: content.value,
         note: note.value,
-        hashtagNames: hashtagNames.value,
+        hashtags: hashtags.value,
         ingredientList: ingredientList.value,
         oldHashtagNamesSet,
         oldIngredientIdSet,
@@ -144,7 +146,7 @@
     await setNewRecipe()
 
     recipeName.value = ''
-    hashtagNames.value = []
+    hashtags.value = []
     ingredientList.value = []
     content.value = ''
     note.value = ''
@@ -180,7 +182,7 @@
       />
     </div>
     <HashtagListEditor
-      v-model="hashtagNames"
+      v-model="hashtags"
       :editing="editing || !recipe"
       :error="hashtagError && submitted"
     />

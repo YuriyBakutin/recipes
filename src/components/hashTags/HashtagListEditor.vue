@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { INameWithId } from '@/types/IIngredientInRecipeItem'
+
   const hashtagInvalidRegExpString = '^_+|_(_)+|[^а-яёА-ЯЁ\\w_]'
 
   // NOTE: Здесь важна последовательность замен. Поэтому массив.
@@ -15,15 +17,17 @@
   const emit = defineEmits(['update:modelValue'])
 
   const props = defineProps<{
-    modelValue?: string[]
+    modelValue?: INameWithId[]
     editing: boolean
     error?: boolean
   }>()
 
-  const newHashtag = ref('')
+  const newHashtagName = ref('')
   const cursorPosition = ref(0)
   const fieldComponent = ref(null)
   const inputElem = ref(null)
+  const hashtags = computed(() => props.modelValue ?? [])
+  const hashtagsLength = computed(() => hashtags.value.length)
 
   const getCursorPosition = () => inputElem.value?.selectionStart
 
@@ -33,19 +37,19 @@
 
   // Обработчик события вставки из буфера обмена
   watch(
-    () => newHashtag.value,
+    () => newHashtagName.value,
     async () => {
       await nextTick()
 
       if (keypressEvent) {
-        // Если изменения newHashtag вызваны вводом с клавиатуры, уходим
+        // Если изменения newHashtagName вызваны вводом с клавиатуры, уходим
         keypressEvent = false
 
         return
       }
 
       if (watchEvent) {
-        // Если этот обработчик запущен из-за изменений в newHashtag, которые
+        // Если этот обработчик запущен из-за изменений в newHashtagName, которые
         // он сам только что сделал, уходим.
         // Флаг watchEvent снимается только после всех изменений,
         // сделанных самим обработчиком, + ждём nextTick().
@@ -54,7 +58,7 @@
 
       watchEvent = true
 
-      let replaced = newHashtag.value
+      let replaced = newHashtagName.value
 
       for (const fromToCouple of replacement) {
         const partFrom = fromToCouple[0]
@@ -62,15 +66,15 @@
         replaced = replaced.replaceAll(new RegExp(partFrom, 'g'), partTo)
       }
 
-      if (replaced === newHashtag.value) {
+      if (replaced === newHashtagName.value) {
         watchEvent = false
 
         return
       }
 
-      newHashtag.value = replaced
+      newHashtagName.value = replaced
       await nextTick()
-      setCursorPosition(newHashtag.value.length)
+      setCursorPosition(newHashtagName.value.length)
       await nextTick()
 
       watchEvent = false
@@ -80,8 +84,8 @@
 
   const insertCharToStringWithHashtag = (char: string) => {
     let cursorPosition = getCursorPosition()
-    const textBefore = newHashtag.value.substring(0, cursorPosition)
-    const textAfter = newHashtag.value.substring(cursorPosition)
+    const textBefore = newHashtagName.value.substring(0, cursorPosition)
+    const textAfter = newHashtagName.value.substring(cursorPosition)
 
     return textBefore + char + textAfter
   }
@@ -91,7 +95,7 @@
       inputElem.value = fieldComponent.value.$el.querySelector('input')
     }
 
-    keypressEvent = true // Признак для блокировки watch newHashtag
+    keypressEvent = true // Признак для блокировки watch newHashtagName
     let char = event.key
 
     if (char === 'Enter') {
@@ -108,9 +112,10 @@
       char = '_'
     }
 
-    const newHashtag = insertCharToStringWithHashtag(char)
+    const newHashtagName = insertCharToStringWithHashtag(char)
+
     const isValid = !new RegExp(hashtagInvalidRegExpString, 'g').test(
-      newHashtag,
+      newHashtagName,
     )
 
     if (isValid) {
@@ -120,56 +125,66 @@
 
   const acceptChar = async (char: string) => {
     let cursorPosition = getCursorPosition()
-    const textBefore = newHashtag.value.substring(0, cursorPosition)
-    const textAfter = newHashtag.value.substring(cursorPosition)
-    newHashtag.value = textBefore + char + textAfter
+    const textBefore = newHashtagName.value.substring(0, cursorPosition)
+    const textAfter = newHashtagName.value.substring(cursorPosition)
+    newHashtagName.value = textBefore + char + textAfter
     await nextTick()
     setCursorPosition(++cursorPosition)
   }
 
   const editHashtag = (index: number) => {
-    const hashtagList = props.modelValue as string[]
+    if (!props.editing) {
+      return
+    }
 
     keypressEvent = true
-    const selectedHashtag = hashtagList[index] + ''
-    newHashtag.value = selectedHashtag
+    newHashtagName.value = hashtags.value[index].name + ''
 
     const newHashtagList = [
-      ...hashtagList.slice(0, index),
-      ...hashtagList.slice(index + 1),
+      ...hashtags.value.slice(0, index),
+      ...hashtags.value.slice(index + 1),
     ]
 
     emit('update:modelValue', newHashtagList)
   }
 
   const addHashtag = () => {
-    if (!newHashtag.value) {
+    if (!newHashtagName.value) {
       return
     }
-    const clearableNewHashtag = newHashtag.value.replaceAll(/_$/g, '')
+    const preparedNewHashtagName = newHashtagName.value.replaceAll(/_$/g, '')
 
-    const newHashtags = [
-      ...new Set(props.modelValue).add(clearableNewHashtag),
-    ].sort()
+    const alreadyAvailable = new Set(
+      hashtags.value.map((item) => item.name),
+    ).has(preparedNewHashtagName)
+
+    if (alreadyAvailable) {
+      return
+    }
+
+    const newHashtags = [...hashtags.value]
+    newHashtags.push({ name: preparedNewHashtagName })
+    newHashtags.sort((a, b) => a.name.localeCompare(b.name))
 
     emit('update:modelValue', newHashtags)
-    newHashtag.value = ''
+    newHashtagName.value = ''
   }
 </script>
 <template>
   <div class="w-full flex flex-col">
     <div class="w-full min-h-20 flex flex-wrap van-padding-left">
       <span class="font-bold text-primary">Хештеги:&nbsp;</span>
-      <template v-if="props.modelValue?.length">
+      <div v-if="!!props.modelValue.length">
         <div
           v-for="(hashtag, index) in props.modelValue"
-          :key="hashtag"
-          class="italic cursor-pointer"
+          :key="hashtag.name"
+          class="italic"
+          :class="{ 'cursor-pointer': props.editing }"
           @click.stop.prevent="editHashtag(index)"
         >
-          #{{ hashtag }},
+          #{{ hashtag.name }},
         </div>
-      </template>
+      </div>
       <span v-else-if="props.error" class="text-error">
         — добавьте хештеги.
       </span>
@@ -180,24 +195,24 @@
     <div v-if="editing" class="w-full flex items-center van-padding-left">
       <Icon
         name="save-up"
-        :clickable="!!newHashtag"
+        :clickable="!!newHashtagName"
         class="text-24"
-        :class="!newHashtag ? 'opacity-[0.5] text-inactive' : 'text-primary'"
+        :class="!newHashtagName ? 'text-inactive' : 'text-primary'"
         @click="addHashtag"
       />
       <div class="relative w-full">
         <van-field
-          v-model="newHashtag"
           ref="fieldComponent"
+          v-model="newHashtagName"
           placeholder="#Добавить хештег"
           @keypress.prevent="onKeypress"
         />
         <Icon
           name="close"
-          :clickable="!!newHashtag"
+          :clickable="!!newHashtagName"
           class="absolute right-0 top-0 bottom-0 text-24 align-middle van-padding-right"
-          :class="!newHashtag ? 'opacity-[0.5] text-inactive' : 'text-primary'"
-          @click="newHashtag = ''"
+          :class="!newHashtagName ? 'text-inactive' : 'text-primary'"
+          @click="newHashtagName = ''"
         />
       </div>
     </div>
