@@ -11,8 +11,14 @@
   }>()
 
   const odd = computed(() => !(props.index % 2))
-
   const inTrash = computed(() => !!props.recipesSearchItem.deletionDate)
+
+  const hashtagNames = computed(() => {
+    const hashtagNames = [...props.recipesSearchItem.hashtagNames]
+    hashtagNames.sort((a, b) => a.localeCompare(b))
+
+    return hashtagNames
+  })
 
   const deleteRecipe = async () => {
     const settings = await dbs.settings.get({ id: 1 })
@@ -53,7 +59,7 @@
         </div>
         <div>
           <span
-            v-for="hashtagName in recipesSearchItem.hashtagNames"
+            v-for="hashtagName in hashtagNames"
             :key="hashtagName"
             class="text-gray-7"
           >

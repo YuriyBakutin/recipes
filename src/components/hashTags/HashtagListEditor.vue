@@ -1,6 +1,7 @@
 <script lang="ts">
   import { db } from '@/db'
   import { INameWithId } from '@/types/IIngredientInRecipeItem'
+  import localeCompareNames from '@/helpers/localeCompareNames'
 
   const hashtagInvalidRegExpString = '^_+|_(_)+|[^а-яёА-ЯЁ\\w_]'
 
@@ -36,12 +37,18 @@
   const cursorPosition = ref(0)
   const fieldComponent = ref(null)
   const inputElem = ref(null)
-  const hashtags = computed(() => props.modelValue ?? [])
   const hashtagsLength = computed(() => hashtags.value.length)
   const focused = ref(false)
   const hashtagPopupList = ref([] as string[])
   const selectedItemIndex = ref(0)
   const enablePopup = ref(true)
+
+  const hashtags = computed(() => {
+    const hashtags = [...props.modelValue]
+    hashtags.sort(localeCompareNames)
+
+    return hashtags
+  })
 
   const onBlur = async () => {
     setTimeout(() => {
@@ -202,7 +209,7 @@
 
     const newHashtags = [...hashtags.value]
     newHashtags.push({ name: preparedNewHashtagName })
-    newHashtags.sort((a, b) => a.name.localeCompare(b.name))
+    newHashtags.sort(localeCompareNames)
 
     emit('update:modelValue', newHashtags)
     newHashtagName.value = ''
@@ -259,9 +266,9 @@
   <div class="w-full flex flex-col">
     <div class="w-full min-h-20 flex flex-wrap van-padding-left">
       <span class="font-bold text-primary">Хештеги:&nbsp;</span>
-      <template v-if="!!props.modelValue.length">
+      <template v-if="!!hashtags.length">
         <div
-          v-for="(hashtag, index) in props.modelValue"
+          v-for="(hashtag, index) in hashtags"
           :key="hashtag.name"
           class="italic"
           :class="{ 'cursor-pointer': props.editing }"
