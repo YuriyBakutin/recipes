@@ -17,7 +17,7 @@
       (await import(`../../icons/${props.name}.svg?raw`))?.default ?? ''
   }
 
-  watch(() => () => props.name, getContent)
+  watch(() => props.name, getContent)
 
   onMounted(async () => {
     await getContent()

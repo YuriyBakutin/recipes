@@ -147,6 +147,8 @@
   const setNewRecipe = async () => {
     await dbs.settings.update(1, { openedRecipeId: null })
     recipeId.value = null
+    oldHashtagNamesSet = new Set()
+    oldIngredientIdSet = new Set()
   }
 
   const clearRecipe = async () => {

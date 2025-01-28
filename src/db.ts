@@ -5,7 +5,7 @@ import { Themes } from '@/types/Themes'
 import { useObservable } from '@vueuse/rxjs'
 import differenceBetweenSets from '@/helpers/differenceBetweenSets'
 
-export interface ISettings { // Здесь пока только один параметр
+export interface ISettings {
   id?: number, // Всегда используется строка с id === 1
   theme?: Themes,
   openedRecipeId?: number | null,
@@ -26,6 +26,26 @@ export class SettingsDatabase extends Dexie {
 }
 
 export const dbs = new SettingsDatabase()
+
+export interface ISearchParam {
+  id?: number,
+  searchInTrash?: boolean,
+  hashtagIds?: number[],
+}
+
+export class SearchParamDatabase extends Dexie {
+  searchParams!: Table<ISearchParam>
+
+  constructor() {
+    super('SearchParamDatabase')
+
+    this.version(1).stores({
+      searchParams: '&id, searchInTrash, hashtagIds',
+    })
+  }
+}
+
+export const dbsp = new SearchParamDatabase()
 
 export interface IRecipe {
   id?: number,
@@ -81,10 +101,11 @@ const scheme = {
 
 export type AnyDbTable = keyof typeof scheme
 
+export type IdNameTable = 'hashtags' | 'ingredients' | 'ingredientUnits'
+
 export type AnyDbTableType =
   IRecipe | IHashtag | IRecipe_hashtag | IHashtagExp |
   IIngredient | IIngredientUnit | IRecipe_Ingredient
-
 
 export class RecipesDatabase extends Dexie {
   recipes!: Table<IRecipe>
@@ -109,8 +130,9 @@ export const observableQuery = <T>(query: () => Promise<T>): Ref<T> => {
 
 
 const loadStaticData = async () => {
-  const settingsData = (await dbs.settings.where({ id: 1 }).first())
+  const settingsData = await dbs.settings.where({ id: 1 }).first()
   const dbInitCompleted = settingsData?.dbInitCompleted
+  await dbsp.searchParams.put({ id: 1, searchInTrash: false, hashtagIds: [] })
 
   if (!dbInitCompleted) {
     try {

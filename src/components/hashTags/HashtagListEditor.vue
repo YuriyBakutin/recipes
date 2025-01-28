@@ -30,13 +30,20 @@
   const props = withDefaults(
     defineProps<{
       modelValue?: INameWithId[]
+      title?: string
+      placeholder?: string
       editing: boolean
       error?: boolean
       cleaning?: boolean
+      availableOnly?: boolean
     }>(),
     {
+      title: 'Хештеги:',
+      placeholder:
+        '— добавьте хештеги, чтобы этот рецепт потом было легче найти.',
       error: false,
       cleaning: false,
+      availableOnly: false,
     },
   )
 
@@ -67,6 +74,13 @@
 
     return hashtags
   })
+
+  const error = computed(
+    () =>
+      props.availableOnly &&
+      !hashtagPopupList.value.length &&
+      !!newHashtagName.value,
+  )
 
   const onBlur = async () => {
     setTimeout(() => {
@@ -139,7 +153,6 @@
 
       watchEvent = false
     },
-    // { immediate: true },
   )
 
   const insertCharToStringWithHashtag = (char: string) => {
@@ -159,7 +172,7 @@
     let char = event.key
 
     if (char === 'Enter') {
-      addHashtag()
+      await addHashtag()
 
       return
     }
@@ -208,14 +221,15 @@
     emit('update:modelValue', newHashtagList)
   }
 
-  const addHashtag = () => {
-    if (!newHashtagName.value) {
+  const addHashtag = async () => {
+    await nextTick()
+
+    if (!newHashtagName.value || error.value) {
       return
     }
 
     enablePopup.value = true
     const preparedNewHashtagName = newHashtagName.value.replaceAll(/_$/g, '')
-    console.log('preparedNewHashtagName: ', preparedNewHashtagName)
 
     const alreadyAvailable = new Set(
       hashtags.value.map((item) => item.name),
@@ -235,10 +249,10 @@
 
   const acceptItem = async (item) => {
     newHashtagName.value = item
-    addHashtag()
+    await addHashtag()
   }
 
-  const onKeydown = (event: KeyboardEvent) => {
+  const onKeydown = async (event: KeyboardEvent) => {
     const code = event.code
 
     if (listItemControlKeys.includes(code)) {
@@ -272,9 +286,9 @@
           if (hashtagPopupList.value?.length && enablePopup.value) {
             newHashtagName.value =
               hashtagPopupList.value[selectedItemIndex.value]
-            addHashtag()
+            await addHashtag()
           } else {
-            addHashtag()
+            await addHashtag()
           }
       }
     }
@@ -283,7 +297,7 @@
 <template>
   <div class="w-full flex flex-col">
     <div class="w-full min-h-20 flex flex-wrap van-padding-left">
-      <span class="font-bold text-primary">Хештеги:&nbsp;</span>
+      <span class="font-bold text-primary">{{ props.title }}&nbsp;</span>
       <template v-if="!!hashtags.length">
         <div
           v-for="(hashtag, index) in hashtags"
@@ -298,9 +312,9 @@
       <span v-else-if="props.error" class="text-error">
         — добавьте хештеги.
       </span>
-      <span v-else class="text-inactive"
-        >— добавьте хештеги, чтобы этот рецепт потом было легче найти.</span
-      >
+      <span v-else class="text-inactive">
+        {{ placeholder }}
+      </span>
     </div>
     <div v-if="editing" class="w-full flex items-center van-padding-left">
       <Icon
@@ -317,6 +331,7 @@
           ref="fieldComponent"
           v-model="newHashtagName"
           placeholder="#Добавить хештег"
+          :error="error"
           @keypress.prevent="onKeypress"
           @keydown="onKeydown"
           @focus="focused = true"

@@ -51,7 +51,7 @@ export default {
 
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],
-        'mono': ['Roboto Mono', 'sans-serif']
+        'mono': ['Roboto Mono', 'monospace']
       },
       colors: { ...Colors },
       boxShadow: {
