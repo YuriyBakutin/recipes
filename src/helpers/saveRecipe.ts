@@ -99,10 +99,12 @@ export default async (
       )]
 
       if (hashtagNamesToDelete.length) {
-        const hashtagIdsToDelete = await db.hashtags
+        const hashtagsToDelete = await db.hashtags
           .where('name')
           .anyOf(hashtagNamesToDelete)
           .toArray()
+
+        const hashtagIdsToDelete = hashtagsToDelete.map((item) => item.id)
 
         const RecipeHashtagKeysToDelete = hashtagIdsToDelete.map((id) => [
           recipe.id,
