@@ -53,7 +53,7 @@
       <div class="w-full flex flex-col">
         <div class="w-full h-24 flex justify-between">
           <div class="flex gap-10 font-bold">
-            <div class="text-primary">{{ '№' + recipesSearchItem.id }}</div>
+            <div class="text-primary">{{ '№ ' + recipesSearchItem.id }}</div>
             <div>{{ recipesSearchItem.name }}</div>
           </div>
         </div>

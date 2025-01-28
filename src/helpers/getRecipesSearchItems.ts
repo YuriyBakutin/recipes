@@ -2,6 +2,7 @@ import Dexie from 'dexie'
 import type { Table, Collection, IndexableType } from 'dexie'
 import { db, dbsp } from '@/db'
 import type { IRecipe } from '@/db'
+import localeCompareNames from '@/helpers/localeCompareNames'
 
 import type {
   IRecipesSearchItem,
@@ -86,6 +87,8 @@ export default async () => {
       ingredientNames,
     })
   }
+
+  recipesSearchItems.sort(localeCompareNames)
 
   return recipesSearchItems
 }
