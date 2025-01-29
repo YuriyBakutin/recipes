@@ -99,6 +99,6 @@
 </template>
 <style>
   .main-block {
-    height: calc(100% - var(--van-tabbar-height));
+    height: calc(100vh - var(--van-tabbar-height));
   }
 </style>

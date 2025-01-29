@@ -31,6 +31,8 @@ export interface ISearchParam {
   id?: number,
   searchInTrash?: boolean,
   hashtagIds?: number[],
+  pageSize?: number,
+  pageNumber?: number,
 }
 
 export class SearchParamDatabase extends Dexie {
