@@ -102,9 +102,11 @@
     Поиск
   </h1>
   <div class="van-padding-x mt-20 mb-20">
-    <van-checkbox v-model="inTrash" shape="square" label-position="left">
-      <span class="text-primary font-bold">Поиск в корзине</span>
-    </van-checkbox>
+    <SimpleCheckbox
+      v-model="inTrash"
+      label="Поиск в корзине"
+      :labelFirst="true"
+    />
   </div>
   <HashtagListEditor
     v-model="hashtags"

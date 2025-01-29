@@ -29,5 +29,6 @@ declare module 'vue' {
     SearchTab: typeof import('./src/components/tabs/SearchTab.vue')['default']
     SettingsTab: typeof import('./src/components/tabs/SettingsTab.vue')['default']
     SimpleButton: typeof import('./src/components/common/SimpleButton.vue')['default']
+    SimpleCheckbox: typeof import('./src/components/common/SimpleCheckbox.vue')['default']
   }
 }
