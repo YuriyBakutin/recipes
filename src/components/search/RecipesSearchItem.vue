@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { showConfirmDialog } from 'vant'
   import { db, dbs } from '@/db'
   import type { IRecipesSearchItem } from '@/types/IRecipesSearchItem'
+  import deleteRecipeFromTrash from '@/helpers/deleteRecipeFromTrash'
 </script>
 <script lang="ts" setup>
   const emit = defineEmits(['openRecipe'])
@@ -32,18 +34,23 @@
     })
   }
 
+  const onDeleteFromTrashClick = async () => {
+    try {
+      await showConfirmDialog({
+        title: 'Подтверждение удаления рецепта',
+        message: 'Эту операцию нельзя будет отменить.',
+        cancelButtonText: 'Отмена',
+        confirmButtonText: 'Удалить',
+      })
+
+      await deleteRecipeFromTrash(props.recipesSearchItem.id)
+    } catch (_) {}
+  }
+
   const restoreRecipe = async () => {
     const result = await db.recipes.update(props.recipesSearchItem.id, {
       deletionDate: null,
     })
-  }
-
-  const deleteRecipeFromTrash = async () => {
-    await nextTick()
-
-    // TODO Здесь нужен диалог подтверждения, а также
-    // транзакция с удалением всех связанных записей
-    console.log('deleteRecipeFromTrash()')
   }
 </script>
 <template>
@@ -108,7 +115,7 @@
             :clickable="true"
             name="close"
             class="text-24"
-            @click="deleteRecipeFromTrash"
+            @click="onDeleteFromTrashClick"
           />
         </div>
       </div>

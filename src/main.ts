@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import Vant from 'vant'
+import { Dialog } from 'vant'
 import { ConfigProvider } from 'vant'
 import 'vant/lib/index.css'
 import '@/styles/vant.css'
@@ -12,5 +13,6 @@ import App from './App.vue'
 
 createApp(App)
   .use(Vant)
+  .use(Dialog)
   .use(ConfigProvider)
   .mount('#app')

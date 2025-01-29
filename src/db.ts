@@ -63,8 +63,8 @@ export interface IHashtag {
 }
 
 export interface IRecipe_hashtag {
-  hashtagId: number,
   recipeId: number,
+  hashtagId: number,
 }
 
 export interface IHashtagExp {
@@ -84,8 +84,8 @@ export interface IIngredientUnit {
 }
 
 export interface IRecipe_Ingredient {
-  ingredientId: number,
   recipeId: number,
+  ingredientId: number,
   unitId: number,
   quantity: number,
 }
