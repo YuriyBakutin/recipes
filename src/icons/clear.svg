@@ -1,6 +1,5 @@
-<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-  stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2">
-  <path d="m10.232 18.33-1.845 3.196m-1.62-5.196-3 5.196m9.929-1.196-.69 1.196" />
-  <path
-    d="M16.041 12.268a1.5 1.5 0 0 0 .55 2.049 1.5 1.5 0 0 1 .548 2.049l-1.077 1.866-8.66-5 1.077-1.866a1.5 1.5 0 0 1 2.05-.549 1.5 1.5 0 0 0 2.048-.549m0 0L16.5 3.474a2 2 0 1 1 3.464 2l-3.923 6.794" />
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+   stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2">
+   <path
+      d="m10.932 14.79-4.134 7.16m6.732-5.66-3.268 5.66m-6.928 0 4.5-7.795L8.91 12.29c1.087-1.884 3.856-.68 4.983-2.629l3.944-6.832c.995-1.75 3.616-.237 2.598 1.5l-3.906 6.765c-1.087 1.884 1.263 3.813.175 5.696l-1.077 1.866-1.902 3.294" />
 </svg>
