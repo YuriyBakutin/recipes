@@ -1,5 +1,4 @@
 import { db } from '@/db'
-import type { IRecipe } from '@/db'
 
 export default async (recipeId: number) => {
   await db.transaction(

@@ -13,6 +13,8 @@ declare module 'vue' {
     FieldAutocomplete: typeof import('./src/components/common/FieldAutocomplete.vue')['default']
     FieldNumber: typeof import('./src/components/common/FieldNumber.vue')['default']
     FieldWithFilter: typeof import('./src/components/common/FieldWithFilter.vue')['default']
+    FileInput: typeof import('./src/components/common/FileInput.vue')['default']
+    FileOutput: typeof import('./src/components/common/FileOutput.vue')['default']
     HashtagListEditor: typeof import('./src/components/hashTags/HashtagListEditor.vue')['default']
     Icon: typeof import('./src/components/common/Icon.vue')['default']
     IngredientDataInput: typeof import('./src/components/ingredients/IngredientDataInput.vue')['default']

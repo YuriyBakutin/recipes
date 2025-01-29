@@ -1,6 +1,17 @@
 <script lang="ts">
-  import { dbs, observableQuery } from '@/db'
+  import {
+    importDB,
+    exportDB,
+    importInto,
+    peakImportFile,
+  } from 'dexie-export-import'
+  import { ExportProgress } from 'node_modules/dexie-export-import/dist/export'
+  import { db, dbs, observableQuery } from '@/db'
   import { Themes } from '@/types/Themes'
+  import getDateTimeStringForFilename from '@/helpers/getDateTimeStringForFilename'
+
+  const progressCallback: (progress: ExportProgress) => boolean = (progress) =>
+    progress.done
 </script>
 <script lang="ts" setup>
   const theme = observableQuery(async () => {
@@ -10,13 +21,55 @@
   const changeTheme = async () => {
     await dbs.settings.update(1, { theme: theme.value })
   }
+
+  const backupUrl = ref('')
+  const backupName = ref('')
+  const preparationReady = ref(false)
+
+  const preparePropsToSaveFile = async () => {
+    const timestamp = getDateTimeStringForFilename()
+    backupName.value = `dbRecipes-${timestamp}v${db.verno}.json`
+
+    const backupBlob = await exportDB(db, {
+      prettyJson: true,
+      progressCallback,
+    })
+
+    backupUrl.value = URL.createObjectURL(backupBlob)
+
+    await nextTick()
+    preparationReady.value = true
+  }
+
+  const restoreFromBackup = async (backupFileContent: string) => {
+    console.log('backupFileContent: ', backupFileContent)
+
+    const backupBlob = new Blob([backupFileContent], {
+      type: 'application/json',
+    })
+
+    console.log('backupBlob: ', backupBlob)
+
+    const options = {
+      acceptMissingTables: false,
+      acceptVersionDiff: false,
+      acceptNameDiff: false,
+      acceptChangedPrimaryKey: false,
+      overwriteValues: true,
+      clearTablesBeforeImport: true,
+      noTransaction: true,
+      progressCallback,
+    }
+
+    await importInto(db, backupBlob, options)
+  }
 </script>
 <template>
   <h1 class="w-full text-center font-bold text-18 text-primary mt-10 mb-14">
     Настройки
   </h1>
   <div class="van-hairline--bottom pt-10 pb-20">
-    <h1 class="text-14 ml-40">Тема</h1>
+    <h1 class="text-14 text-primary font-bold van-padding-left">Тема</h1>
     <van-radio-group
       v-model="theme"
       direction="horizontal"
@@ -37,5 +90,26 @@
         </div>
       </van-radio>
     </van-radio-group>
+  </div>
+  <div class="van-hairline--bottom pt-20 pb-20">
+    <h1 class="text-14 text-primary font-bold van-padding-left">
+      Резервные копии
+    </h1>
+    <div class="van-padding flex justify-between mt-20 px-80">
+      <FileOutput
+        iconName="db-save"
+        label="Создать резервную копию"
+        :urlToSave="backupUrl"
+        :fileName="backupName"
+        :preparationReady="preparationReady"
+        @click="preparePropsToSaveFile"
+        @saveDialogLinkClicked="preparationReady = false"
+      />
+      <FileInput
+        iconName="db-restore"
+        label="Восстановить из резервной копии"
+        @afterRead="restoreFromBackup"
+      />
+    </div>
   </div>
 </template>
