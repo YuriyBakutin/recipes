@@ -29,3 +29,4 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+components.d.ts.d.ts
