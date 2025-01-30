@@ -76,16 +76,20 @@
 
   const searchObj = observableQuery(getRecipesSearchItems)
 
+  type searchObjType =
+    | {
+        endOfPages: boolean
+        recipesSearchItems: IRecipesSearchItem[]
+      }
+    | undefined
+
   const recipesSearchItems = ref([] as IRecipesSearchItem[])
   const endOfPages = ref(false)
 
   watchEffect(async () => {
-    const searchObjTypeOk = searchObj.value as {
-      endOfPages: boolean
-      recipesSearchItems: IRecipesSearchItem[]
-    }
+    const searchObjTypeOk = searchObj.value as searchObjType
 
-    recipesSearchItems.value = searchObjTypeOk.recipesSearchItems
+    recipesSearchItems.value = searchObjTypeOk?.recipesSearchItems ?? []
 
     endOfPages.value = !!(
       (searchObj.value ?? []) as {
