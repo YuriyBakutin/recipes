@@ -46,7 +46,7 @@
       {{ props.label }}
     </span>
     <Icon
-      :name="props.modelValue ? checkedIconName : uncheckedIconName"
+      :name="props.modelValue ? props.checkedIconName : props.uncheckedIconName"
       :clickable="!props.disabled"
       :class="props.disabled ? 'opacity-60' : ''"
       :style="{ 'font-size': props.iconSize + 'px' }"
