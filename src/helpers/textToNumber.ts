@@ -1,6 +1,6 @@
-export default (text: string) => {
+export default (text?: string) => {
   if (!text) {
-    return null
+    return
   }
 
   return +text.replace(',', '.').replace(' ', '')

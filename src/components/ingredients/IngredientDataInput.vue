@@ -1,7 +1,6 @@
 <script lang="ts">
-  import textToNumber from '@/helpers/textToNumber'
-  import numberToText from '@/helpers/numberToText'
-  import {
+  import { DEFAULT_QUANTITY } from '@/components/common/QuantityField.vue'
+  import type {
     INameWithId,
     IIngredientInRecipeItem,
   } from '@/types/IIngredientInRecipeItem'
@@ -10,11 +9,10 @@
     ({
       ingredient: { name: '' },
       unit: { name: '' },
-      quantity: 1,
+      quantity: DEFAULT_QUANTITY,
     }) as IIngredientInRecipeItem
 
   const initUnacceptedFieldsObj = () => ({ ingredient: false, unit: false })
-  const DEFAULT_QUANTITY = 1
 </script>
 <script lang="ts" setup>
   const emit = defineEmits(['add', 'cleared'])
@@ -26,7 +24,7 @@
       cleaning?: boolean
     }>(),
     {
-      ingredientHiddenItemList: [],
+      ingredientHiddenItemList: () => [],
       cleaning: false,
     },
   )
@@ -57,7 +55,7 @@
   type FieldName = 'ingredient' | 'unit'
 
   const quantityIsInvalid = computed(() =>
-    isNaN(newIngredientItem.value.quantity),
+    Number.isNaN(newIngredientItem.value.quantity),
   )
 
   const readyAddToList = computed(

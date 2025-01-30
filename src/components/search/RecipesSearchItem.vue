@@ -25,7 +25,7 @@
   const deleteRecipe = async () => {
     const settings = await dbs.settings.get({ id: 1 })
 
-    if (settings.openedRecipeId === props.recipesSearchItem.id) {
+    if (settings?.openedRecipeId === props.recipesSearchItem.id) {
       await dbs.settings.update(1, { openedRecipeId: null })
     }
 
@@ -43,12 +43,12 @@
         confirmButtonText: 'Удалить',
       })
 
-      await deleteRecipeFromTrash(props.recipesSearchItem.id)
+      await deleteRecipeFromTrash(props.recipesSearchItem.id as number)
     } catch (_) {}
   }
 
   const restoreRecipe = async () => {
-    const result = await db.recipes.update(props.recipesSearchItem.id, {
+    await db.recipes.update(props.recipesSearchItem.id, {
       deletionDate: null,
     })
   }

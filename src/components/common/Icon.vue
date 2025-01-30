@@ -10,7 +10,6 @@
   )
 
   const content = ref('' as any)
-  const iconEnvelope = ref(null)
 
   const getContent = async () => {
     content.value =
@@ -26,7 +25,6 @@
 <template>
   <button
     :disabled="!props.clickable"
-    ref="iconEnvelope"
     class="icon-button inline-flex justify-center items-center text-center"
     :class="{ 'clickable cursor-pointer': props.clickable }"
     v-html="content"
@@ -41,6 +39,6 @@
 
   .clickable.icon-button:focus,
   .clickable.icon-button:hover {
-    @apply opacity-60;
+    opacity: 0.6;
   }
 </style>

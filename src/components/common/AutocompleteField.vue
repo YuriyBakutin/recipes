@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Collection, IndexableType } from 'dexie'
   import { db } from '@/db'
-  import type { AnyDbTable, AnyDbTableType } from '@/db'
+  import type { IdNameTable, IdNameTableType } from '@/db'
 
   // const movingKeys = ['ArrowRight', 'ArrowLeft', 'Home', 'End']
 
@@ -22,10 +22,9 @@
       text?: string
       placeholder?: string
       error?: boolean
-      dbTableName: AnyDbTable
+      dbTableName: IdNameTable
       align?: 'left' | 'right'
       margin?: boolean
-      keyName?: string
       showPopupOnFocus?: boolean
 
       // Массив уже введённых значений, которые не должны быть показаны
@@ -41,17 +40,16 @@
       error: false,
       align: 'left',
       margin: false,
-      keyName: 'name',
       showPopupOnFocus: false,
-      hiddenItemList: [],
+      hiddenItemList: () => [],
       focusRequest: false,
       cleaning: false,
     },
   )
 
   const text = ref('')
-  const fieldComponent = ref(null)
-  const inputElem = ref(null)
+  const fieldComponent = ref<ComponentPublicInstance<HTMLInputElement>>()
+  const inputElem = ref<HTMLInputElement>()
 
   watch(
     () => props.cleaning,
@@ -75,43 +73,42 @@
     (newFocusRequest, oldFocusRequest) => {
       if (newFocusRequest && newFocusRequest !== oldFocusRequest) {
         emit('focused')
-        fieldComponent.value.focus()
+        fieldComponent.value?.focus()
       }
     },
   )
 
   const itemList = ref([] as { id?: number; name: string }[])
-  const showPopupSelect = ref(false)
   const selectedItemIndex = ref(0)
   const focused = ref(false)
 
   const fieldEventHandler = async () => {
-    let collection = db[props.dbTableName] as unknown as Collection<
-      AnyDbTableType,
+    let request = db[props.dbTableName]
+
+    let collectionRequest = null as Collection<
+      IdNameTableType,
       IndexableType,
-      AnyDbTableType
-    >
+      IdNameTableType
+    > | null
 
     if (!props.showPopupOnFocus || text.value.length) {
-      collection = collection
-        .where(props.keyName)
-        .startsWithIgnoreCase(text.value)
+      collectionRequest = request.where('name').startsWithIgnoreCase(text.value)
     }
 
-    itemList.value = ((await collection.toArray()) ?? []).filter(
-      (item) => !props.hiddenItemList.includes(item.name),
-    )
+    itemList.value = (
+      (await (collectionRequest ?? request).toArray()) ?? []
+    ).filter((item) => !props.hiddenItemList.includes(item.name))
   }
 
   watch(() => text.value, fieldEventHandler)
 
   const itemByTexFromItemList = computed(() => {
     return (itemList.value ?? []).find(
-      (itemListItem) => itemListItem[props.keyName] === text.value,
+      (itemListItem) => itemListItem['name'] === text.value,
     )
   })
 
-  const acceptItem = async (item?: { id?: number; [key: string]: string }) => {
+  const acceptItem = async (item?: { id?: number; name: string }) => {
     if (props.hiddenItemList.includes(text.value)) {
       return
     }
@@ -121,7 +118,7 @@
 
       await nextTick()
 
-      const textLength = item[props.keyName].length
+      const textLength = item['name'].length
       inputElem.value?.setSelectionRange(textLength, textLength)
 
       onFocus()
@@ -129,7 +126,7 @@
     }
 
     const payload = itemByTexFromItemList.value ?? {
-      [props.keyName]: text.value,
+      ['name']: text.value,
     }
 
     emit('select', payload)
@@ -145,7 +142,7 @@
       result.push(item['name'])
 
       return result
-    }, [])
+    }, [] as string[])
 
     if (itemListLocale.includes(text.value)) {
       acceptItem()
@@ -164,7 +161,7 @@
 
       switch (code) {
         case 'Escape':
-          text.value = props.text
+          text.value = props.text ?? ''
           break
         case 'PageUp':
         case 'PageDown':
@@ -222,7 +219,7 @@
   })
 
   onMounted(() => {
-    inputElem.value = fieldComponent.value.$el.querySelector('input')
+    inputElem.value = fieldComponent.value?.$el.querySelector('input')
   })
 </script>
 <template>
@@ -260,7 +257,7 @@
         :class="{ 'bg-gray-4': index === selectedItemIndex }"
         @click="acceptItem(item)"
       >
-        {{ item[props.keyName] }}
+        {{ item['name'] }}
       </div>
     </div>
   </div>

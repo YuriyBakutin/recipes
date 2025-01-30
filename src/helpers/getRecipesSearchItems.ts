@@ -1,6 +1,6 @@
 import Dexie from 'dexie'
 import { db, dbsp } from '@/db'
-import type { IRecipe } from '@/db'
+import type { IRecipe, IRecipe_hashtag, IRecipe_Ingredient } from '@/db'
 
 import type {
   IRecipesSearchItem,
@@ -66,7 +66,7 @@ export default async () => {
       .toArray()
 
     if (!recipeHashtags?.length) {
-      return []
+      return { endOfPages, recipesSearchItems: [] as IRecipesSearchItem[] } // []
     }
 
     stepRecipeIds = recipeHashtags.map((item) => item.recipeId)
@@ -113,8 +113,8 @@ export default async () => {
       db.recipe_ingredient.where('recipeId').equals(recipe.id as number).toArray(),
     ])
 
-    const recipeHashtags = response[0] ?? []
-    const recipeIngredients = response[1] ?? []
+    const recipeHashtags = response[0] ?? [] as IRecipe_hashtag[]
+    const recipeIngredients = response[1] ?? [] as IRecipe_Ingredient[]
 
     const hashtagIds = recipeHashtags.map((item) => {
       return item.hashtagId

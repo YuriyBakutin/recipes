@@ -1,4 +1,4 @@
-export default (quantity: number, step: number, min?: number, max?: number) => {
+export default (quantity: any, step: number, min?: number, max?: number) => {
   let result = isNaN(quantity) ? 0 : quantity
 
   if (step > 0) {

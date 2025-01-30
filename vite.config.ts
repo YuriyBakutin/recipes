@@ -15,7 +15,7 @@ export default defineConfig({
     AutoImport({
       imports: ['vue'],
       resolvers: [VantResolver()],
-      dts: true,
+      dts: 'auto-imports.d.ts',
     }),
     Components({
       dirs: [
@@ -25,7 +25,7 @@ export default defineConfig({
         'src/components/hashTags',
         'src/components/search',
       ],
-      dts: true,
+      dts: 'components.d.ts.d.ts',
     }),
   ],
   resolve: {

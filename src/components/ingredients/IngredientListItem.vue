@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { IIngredientInRecipeItem } from '@/types/IIngredientInRecipeItem'
+  import type { IIngredientInRecipeItem } from '@/types/IIngredientInRecipeItem'
 </script>
 <script lang="ts" setup>
   const emit = defineEmits(['edit'])

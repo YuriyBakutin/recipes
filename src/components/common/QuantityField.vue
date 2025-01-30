@@ -2,13 +2,15 @@
   import textToNumber from '@/helpers/textToNumber'
   import numberToText from '@/helpers/numberToText'
   import incrementOrDecrementQuantity from '@/helpers/incrementOrDecrementQuantity'
+
+  export const DEFAULT_QUANTITY = 1
 </script>
 <script lang="ts" setup>
   const emit = defineEmits(['update:modelValue'])
 
   const props = withDefaults(
     defineProps<{
-      modelValue: number | null
+      modelValue?: number
       defaultQuantity?: number
       step?: number
       min?: number
@@ -16,15 +18,15 @@
       error?: boolean
     }>(),
     {
-      defaultQuantity: 1,
+      defaultQuantity: DEFAULT_QUANTITY,
       step: 1,
       min: 0.01,
       max: 10_000,
     },
   )
 
-  const quantity = ref(1 as number | null)
-  const quantityText = ref('1')
+  const quantity = ref(DEFAULT_QUANTITY as number | undefined)
+  const quantityText = ref(String(DEFAULT_QUANTITY) as string | undefined)
 
   watch(
     () => props.modelValue,
@@ -51,7 +53,7 @@
   }
 
   const quantityToText = () => {
-    if (isNaN(quantity.value)) {
+    if (Number.isNaN(quantity.value)) {
       return
     }
 
@@ -65,7 +67,7 @@
   }
 
   const onQuantityFieldBlur = () => {
-    if (isNaN(quantity.value)) {
+    if (Number.isNaN(quantity.value)) {
       return
     }
 

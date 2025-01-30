@@ -1,10 +1,6 @@
 <script lang="ts">
-  import Dexie from 'dexie'
   import { db, dbs, dbsp, observableQuery } from '@/db'
-  import type {
-    IHashtagAndIngredientNames,
-    IRecipesSearchItem,
-  } from '@/types/IRecipesSearchItem'
+  import type { IRecipesSearchItem } from '@/types/IRecipesSearchItem'
   import type { INameWithId } from '@/types/IIngredientInRecipeItem'
   import getRecipesSearchItems from '@/helpers/getRecipesSearchItems'
 </script>
@@ -44,12 +40,11 @@
     async () => {
       const hashtagNames = hashtags.value.map((item) => item.name)
 
-      const hashtagsWithIds = await db.hashtags
-        .where('name')
-        .anyOf(hashtagNames)
-        .toArray()
+      const hashtagsWithIds =
+        (await db.hashtags.where('name').anyOf(hashtagNames).toArray()) ?? []
 
-      const ids = hashtagsWithIds.map((item) => item.id)
+      const ids = hashtagsWithIds.map((item) => item.id) as number[]
+
       await dbsp.searchParams.update(1, {
         hashtagIds: ids,
         pageNumber: 1,
@@ -79,17 +74,28 @@
     { immediate: true },
   )
 
-  const SearchObj = observableQuery(getRecipesSearchItems)
+  const searchObj = observableQuery(getRecipesSearchItems)
 
-  const recipesSearchItems = ref([])
+  const recipesSearchItems = ref([] as IRecipesSearchItem[])
   const endOfPages = ref(false)
 
   watchEffect(async () => {
-    recipesSearchItems.value = SearchObj.value?.recipesSearchItems ?? []
-    endOfPages.value = !!SearchObj.value?.endOfPages
+    const searchObjTypeOk = searchObj.value as {
+      endOfPages: boolean
+      recipesSearchItems: IRecipesSearchItem[]
+    }
+
+    recipesSearchItems.value = searchObjTypeOk.recipesSearchItems
+
+    endOfPages.value = !!(
+      (searchObj.value ?? []) as {
+        endOfPages: boolean
+        recipesSearchItems: IRecipesSearchItem[]
+      }
+    ).endOfPages
   })
 
-  const onOpenRecipe = async (recipeId) => {
+  const onOpenRecipe = async (recipeId: number) => {
     await dbs.settings.update(1, { openedRecipeId: recipeId })
   }
 

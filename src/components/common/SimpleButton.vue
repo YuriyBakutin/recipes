@@ -1,7 +1,7 @@
 <script lang="ts" setup>
   const props = withDefaults(
     defineProps<{
-      iconName?: string
+      iconName: string
       iconSize?: number | string
       label: string
       disabled?: boolean

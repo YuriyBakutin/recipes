@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { db, dbs, observableQuery } from '@/db'
+  import { dbs, observableQuery } from '@/db'
   import { Themes } from '@/types/Themes'
   import { Colors, colorsInit } from '@/data/Colors'
   import SearchTab from '@/components/tabs/SearchTab.vue'

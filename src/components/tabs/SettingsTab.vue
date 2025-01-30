@@ -1,11 +1,7 @@
 <script lang="ts">
-  import {
-    importDB,
-    exportDB,
-    importInto,
-    peakImportFile,
-  } from 'dexie-export-import'
-  import { ExportProgress } from 'node_modules/dexie-export-import/dist/export'
+  import { exportDB, importInto } from 'dexie-export-import'
+
+  import type { ExportProgress } from 'dexie-export-import'
   import { db, dbs, observableQuery } from '@/db'
   import { Themes } from '@/types/Themes'
   import getDateTimeStringForFilename from '@/helpers/getDateTimeStringForFilename'
@@ -42,13 +38,9 @@
   }
 
   const restoreFromBackup = async (backupFileContent: string) => {
-    console.log('backupFileContent: ', backupFileContent)
-
     const backupBlob = new Blob([backupFileContent], {
       type: 'application/json',
     })
-
-    console.log('backupBlob: ', backupBlob)
 
     const options = {
       acceptMissingTables: false,

@@ -5,6 +5,6 @@ export interface INameWithId {
 
 export interface IIngredientInRecipeItem {
   ingredient: INameWithId
-  quantity: number | null
+  quantity?: number
   unit: INameWithId
 }

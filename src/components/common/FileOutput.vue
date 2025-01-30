@@ -25,26 +25,18 @@
   )
 
   const onPrepareProps = ref(false)
-  const saveFileLinkElem = ref(null)
+  const saveFileLinkElem = ref<HTMLLinkElement>()
 
   watch(
     () => props.preparationReady,
     async () => {
       if (props.preparationReady) {
         onPrepareProps.value = false
-        saveFileLinkElem.value.click()
+        ;(saveFileLinkElem.value as HTMLLinkElement).click()
         emit('saveDialogLinkClicked')
       }
     },
   )
-
-  const emitPreparePropsToSaveFile = () => {
-    if (onPrepareProps.value || props.preparationReady) {
-      return
-    }
-
-    onPrepareProps.value = true
-  }
 </script>
 <template>
   <SimpleButton

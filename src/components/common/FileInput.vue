@@ -20,10 +20,10 @@
     },
   )
 
-  const inputFileElem = ref(null)
+  const inputFileElem = ref<HTMLInputElement>()
 
   const getFile = async (event: Event) => {
-    const file = inputFileElem.value.files[0]
+    const file = (inputFileElem.value as HTMLInputElement).files?.[0]
 
     if (!file) {
       return
@@ -31,12 +31,17 @@
 
     const reader = new FileReader()
 
+    interface IOnloadFileReaderEventTarget extends EventTarget {
+      result: string
+      error: string
+    }
+
     reader.onload = (event: Event) => {
-      emit('afterRead', event.target.result)
+      emit('afterRead', (event.target as IOnloadFileReaderEventTarget).result)
     }
 
     reader.onerror = (event: Event) => {
-      const error = event.target.error
+      const error = (event.target as IOnloadFileReaderEventTarget).error
       console.error(`При чтении ${file.name} произошла ошибка`, error)
     }
 
@@ -51,7 +56,7 @@
     :disabled="props.disabled"
     :fontBold="props.fontBold"
     :labelFirst="props.labelFirst"
-    @click="inputFileElem.click()"
+    @click="(inputFileElem as HTMLInputElement).click()"
   />
   <input
     ref="inputFileElem"

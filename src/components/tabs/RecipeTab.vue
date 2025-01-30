@@ -1,7 +1,7 @@
 <script lang="ts">
   import Dexie from 'dexie'
   import { db, dbs, observableQuery } from '@/db'
-  import type { IRecipe } from '@/db'
+  import type { IRecipe, IHashtag } from '@/db'
   import type {
     IIngredientInRecipeItem,
     INameWithId,
@@ -12,7 +12,6 @@
   let oldIngredientIdSet = new Set<number>()
 </script>
 <script lang="ts" setup>
-  const loading = ref(false)
   const submitted = ref(false)
   const editing = ref(false)
   const cleaning = ref(false)
@@ -63,9 +62,10 @@
     ])
 
     const hashtagIds = result[0]?.map((item) => item.hashtagId)
-    hashtags.value = (await db.hashtags.bulkGet(hashtagIds)) ?? []
+    hashtags.value = ((await db.hashtags.bulkGet(hashtagIds)) ??
+      []) as IHashtag[]
 
-    const tasks = [] as Promise<INameWithId>[]
+    const tasks = [] as Promise<INameWithId | undefined>[]
     const result1Length = result[1]?.length ?? 0
 
     for (let index = 0; index < result1Length; index++) {
@@ -79,20 +79,24 @@
 
     for (let index = 0; index < result1Length; index++) {
       unsortedIngredientList.push({
-        ingredient: ingredientsAndUnits[index * 2],
+        ingredient: ingredientsAndUnits[index * 2] as INameWithId,
         quantity: result[1][index].quantity,
-        unit: ingredientsAndUnits[index * 2 + 1],
+        unit: ingredientsAndUnits[index * 2 + 1] as INameWithId,
       })
     }
 
     ingredientList.value = unsortedIngredientList.sort((a, b) =>
-      a.ingredient.name.localeCompare(b.ingredient.name),
+      (a.ingredient as INameWithId).name.localeCompare(
+        (b.ingredient as INameWithId).name,
+      ),
     )
 
     oldHashtagNamesSet = new Set(hashtags.value.map((item) => item.name))
 
     oldIngredientIdSet = new Set(
-      ingredientList.value.map((item) => item.ingredient.id),
+      (ingredientList.value as IIngredientInRecipeItem[]).map(
+        (item) => item.ingredient.id as number,
+      ),
     )
   }
 
@@ -122,7 +126,7 @@
 
     try {
       const updateObject = await saveRecipe({
-        recipeId: recipeId.value,
+        recipeId: recipeId.value as number,
         recipeName: recipeName.value,
         content: content.value,
         note: note.value,
@@ -134,7 +138,7 @@
 
       oldHashtagNamesSet = updateObject.oldHashtagNamesSet
       oldIngredientIdSet = updateObject.oldIngredientIdSet
-      recipeId.value = updateObject.recipeId
+      recipeId.value = updateObject.recipeId as number
 
       await dbs.settings.update(1, { openedRecipeId: recipeId.value })
 

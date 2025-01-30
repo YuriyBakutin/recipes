@@ -1,12 +1,10 @@
 <script lang="ts">
-  import Dexie from 'dexie'
-  import { db } from '@/db'
-  import { IIngredientInRecipeItem } from '@/types/IIngredientInRecipeItem'
+  import type { IIngredientInRecipeItem } from '@/types/IIngredientInRecipeItem'
 
   const getEmptyIngredient = () =>
     ({
       ingredient: { name: '' },
-      quantity: null,
+      quantity: 1,
       unit: { name: '' },
     }) as IIngredientInRecipeItem
 </script>
@@ -30,7 +28,6 @@
     },
   )
 
-  const loading = ref(false)
   const ingredientList = ref([] as IIngredientInRecipeItem[])
 
   watch(
@@ -80,7 +77,7 @@
     <template v-if="ingredientList?.length">
       <IngredientListItem
         v-for="(ingredient, index) in ingredientList ?? []"
-        :key="ingredient.ingredientName"
+        :key="ingredient.ingredient.id"
         :ingredient="ingredient"
         :index="index"
         :editing="editing"

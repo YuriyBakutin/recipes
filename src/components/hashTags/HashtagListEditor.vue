@@ -1,6 +1,6 @@
 <script lang="ts">
   import { db } from '@/db'
-  import { INameWithId } from '@/types/IIngredientInRecipeItem'
+  import type { INameWithId } from '@/types/IIngredientInRecipeItem'
   import localeCompareNames from '@/helpers/localeCompareNames'
 
   const hashtagInvalidRegExpString = '^_+|_(_)+|[^а-яёА-ЯЁ\\w_]'
@@ -59,17 +59,15 @@
     },
   )
 
-  const cursorPosition = ref(0)
-  const fieldComponent = ref(null)
-  const inputElem = ref(null)
-  const hashtagsLength = computed(() => hashtags.value.length)
+  const fieldComponent = ref<ComponentPublicInstance<HTMLInputElement>>()
+  const inputElem = ref<HTMLInputElement>()
   const focused = ref(false)
   const hashtagPopupList = ref([] as string[])
   const selectedItemIndex = ref(0)
   const enablePopup = ref(true)
 
   const hashtags = computed(() => {
-    const hashtags = [...props.modelValue]
+    const hashtags = [...(props.modelValue ?? [])]
     hashtags.sort(localeCompareNames)
 
     return hashtags
@@ -109,7 +107,9 @@
       // Заранее неясно, что раньше отработает — перестройка DOM
       // или обращение в базу. Поэтому оба под общим Promise.all
 
-      const selectedHashtagNames = props.modelValue.map((item) => item.name)
+      const selectedHashtagNames = (props.modelValue ?? []).map(
+        (item) => item.name,
+      )
 
       hashtagPopupList.value = (result[0] ?? [])
         .map((item) => item.name)
@@ -157,6 +157,11 @@
 
   const insertCharToStringWithHashtag = (char: string) => {
     let cursorPosition = getCursorPosition()
+
+    if (!cursorPosition) {
+      return newHashtagName.value
+    }
+
     const textBefore = newHashtagName.value.substring(0, cursorPosition)
     const textAfter = newHashtagName.value.substring(cursorPosition)
 
@@ -165,7 +170,9 @@
 
   const onKeypress = async (event: KeyboardEvent) => {
     if (!inputElem.value) {
-      inputElem.value = fieldComponent.value.$el.querySelector('input')
+      inputElem.value = (
+        fieldComponent.value as ComponentPublicInstance<HTMLInputElement>
+      ).$el.querySelector('input')
     }
 
     keypressEvent = true // Признак для блокировки watch newHashtagName
@@ -198,11 +205,19 @@
 
   const acceptChar = async (char: string) => {
     let cursorPosition = getCursorPosition()
-    const textBefore = newHashtagName.value.substring(0, cursorPosition)
-    const textAfter = newHashtagName.value.substring(cursorPosition)
+
+    if (Number.isNaN(cursorPosition)) {
+      return
+    }
+
+    const textBefore = newHashtagName.value.substring(
+      0,
+      cursorPosition as number,
+    )
+    const textAfter = newHashtagName.value.substring(cursorPosition as number)
     newHashtagName.value = textBefore + char + textAfter
     await nextTick()
-    setCursorPosition(++cursorPosition)
+    setCursorPosition(++(cursorPosition as number))
   }
 
   const editHashtag = (index: number) => {
@@ -247,7 +262,7 @@
     newHashtagName.value = ''
   }
 
-  const acceptItem = async (item) => {
+  const acceptItem = async (item: string) => {
     newHashtagName.value = item
     await addHashtag()
   }
