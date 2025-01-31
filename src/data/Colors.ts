@@ -11,6 +11,7 @@ export enum Colors {
   'gray-7' = '#646566',
   'gray-8' = '#323233',
   'gray-9' = '#1c1c1c',
+  'gray-10' = '#4b4b4b',
   'red-1' = '#ee0a24',
   'red-2' = '#960617',
   'brown-1' = '#850000',

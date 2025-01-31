@@ -240,25 +240,53 @@
         name="ok"
         class="text-24 text-primary absolute right-2 top-0"
       />
-    </div>
-
-    <div
-      v-if="
-        itemList.length &&
-        (text || props.showPopupOnFocus) &&
-        focused &&
-        !accepted
-      "
-      :class="popupClass"
-    >
       <div
-        v-for="(item, index) in itemList ?? []"
-        class="w-full cursor-pointer hover:bg-gray-3"
-        :class="{ 'bg-gray-4': index === selectedItemIndex }"
-        @click="acceptItem(item)"
+        v-if="
+          itemList.length &&
+          (text || props.showPopupOnFocus) &&
+          focused &&
+          !accepted
+        "
+        class="absolute top-0 mt-28 z-10 p-6 popup-card"
+        :class="props.align === 'left' ? 'left-0' : 'right-0'"
       >
-        {{ item['name'] }}
+        <div
+          v-for="(item, index) in itemList ?? []"
+          class="w-full cursor-pointer popup"
+          :class="{ 'popup-line-select': index === selectedItemIndex }"
+          @click="acceptItem(item)"
+        >
+          {{ item['name'] }}
+        </div>
       </div>
     </div>
   </div>
 </template>
+<style>
+  .popup-card {
+    background-color: var(--van-white);
+    border: 1px solid var(--van-gray-6);
+    border-radius: 4px;
+  }
+
+  .van-theme-dark .popup-card {
+    background-color: var(--van-dark);
+    border: 1px solid var(--van-gray-6);
+  }
+
+  .popup:hover {
+    background-color: var(--van-gray-3);
+  }
+
+  .van-theme-dark .popup:hover {
+    background-color: var(--van-gray-8);
+  }
+
+  .popup-line-select {
+    background-color: var(--van-gray-4);
+  }
+
+  .van-theme-dark .popup-line-select {
+    background-color: var(--van-gray-10);
+  }
+</style>
