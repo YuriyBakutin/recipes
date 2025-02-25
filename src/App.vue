@@ -34,8 +34,6 @@
     () => tabOptions[currentTabName.value].component,
   )
 
-  const currentTitle = computed(() => tabOptions[currentTabName.value].title)
-
   const theme = observableQuery(async () => {
     return (await dbs.settings.get({ id: 1 }))?.theme ?? Themes.light
   })
