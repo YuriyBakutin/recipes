@@ -1,7 +1,7 @@
-import Dexie, { liveQuery } from 'dexie';
-import type { Table, Observable } from 'dexie';
+import Dexie, { liveQuery } from 'dexie'
+import type { Table } from 'dexie'
 import type { Ref } from 'vue'
-import { Themes } from '@/types/Themes'
+import type { Themes } from '@/types/Themes'
 import { useObservable } from '@vueuse/rxjs'
 import differenceBetweenSets from '@/helpers/differenceBetweenSets'
 
